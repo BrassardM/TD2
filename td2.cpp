@@ -157,7 +157,6 @@ ListeFilms creerListe(string nomFichier)
 	for (int i = 0; i < nElements; i++) {
 		ajouterFilms(listefilms, lireFilm(fichier,listefilms)); //TODO: Ajouter le film à la liste.
 	}
-
 	return listefilms; //TODO: Retourner la liste de films.
 }
 
@@ -168,7 +167,7 @@ void detruireFilm(Film* filmdetruit) {
 			enleverFilm(filmdetruit->acteurs.elements[i]->joueDans, filmdetruit);
 		}
 		else {
-			cout << endl << "Detruit l'acteur : " << filmdetruit->acteurs.elements[i]->nom << endl;
+			//cout << endl << "Detruit l'acteur : " << filmdetruit->acteurs.elements[i]->nom << endl; //(DEBUG)
 			delete[] filmdetruit->acteurs.elements[i]->joueDans.elements;
 			delete filmdetruit->acteurs.elements[i];
 		}
