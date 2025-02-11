@@ -48,6 +48,6 @@ struct Film
 
 struct Acteur
 {
-	std::string nom; int anneeNaissance; char sexe;
+	std::string nom = ""; int anneeNaissance = 0; char sexe = ' ';
 	ListeFilms joueDans;
 };
