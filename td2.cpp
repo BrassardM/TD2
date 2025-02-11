@@ -83,10 +83,12 @@ void ListeFilms::enleverFilm(Film* filmEnleve) {
 }
 //TODO: Une fonction pour trouver un Acteur par son nom dans une ListeFilms, qui retourne un pointeur vers l'acteur, ou nullptr si l'acteur n'est pas trouvé.  Devrait utiliser span.
 Acteur* ListeFilms::trouverActeur(const string& nom) const {
-	for (unsigned i : range(0, nElements_)) {
-		for (unsigned j : range(0, elements_[i]->acteurs.nElements)) {
-			if (elements_[i]->acteurs.elements[j]->nom == nom) {
-				return elements_[i]->acteurs.elements[j];
+	span<Film*> spanfilms({ elements_, long unsigned(nElements_) });
+	for (Film* n : spanfilms) {
+		span<Acteur*> spanacteur({ n->acteurs.elements, long unsigned(n->acteurs.nElements) });
+		for (Acteur* m : spanacteur ) {
+			if (m->nom == nom) {
+				return m;
 			}
 		}
 	}
@@ -199,11 +201,13 @@ void ListeFilms::afficherListeFilms() const
 	//TODO: Utiliser des caractères Unicode pour définir la ligne de séparation (différente des autres lignes de séparations dans ce progamme).
 	static const string ligneDeSeparation = "\n\033[35m-------\033[0m\n";
 	//TODO: Changer le for pour utiliser un span.
-	for (int i = 0; i < nElements_; i++) {
+	span<Film*> spanfilm({ elements_,long unsigned(nElements_) });
+	for (Film* n : spanfilm) {
 		//TODO: Afficher le film.
-		cout << ligneDeSeparation << elements_[i]->titre << endl;
-		for (int j : range(0, elements_[i]->acteurs.nElements)) {
-			afficherActeur(*(elements_[i]->acteurs.elements[j]));
+		cout << ligneDeSeparation << n->titre << endl;
+		span<Acteur*> spanacteur({ n->acteurs.elements, long unsigned(n->acteurs.nElements) });
+		for (Acteur* m : spanacteur) {
+			cout << m << endl;
 		}
 	}
 }
