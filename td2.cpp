@@ -207,7 +207,7 @@ void ListeFilms::afficherListeFilms() const
 		cout << ligneDeSeparation << n->titre << endl;
 		span<Acteur*> spanacteur({ n->acteurs.elements, long unsigned(n->acteurs.nElements) });
 		for (Acteur* m : spanacteur) {
-			cout << m << endl;
+			afficherActeur(*m);
 		}
 	}
 }
