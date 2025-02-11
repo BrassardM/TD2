@@ -12,7 +12,6 @@ private:
 public:
 	ListeFilms(const std::string& filename);
 	ListeFilms();
-	int getCapacite() const { return capacite_; }
 	int getnElements() const { return nElements_; }
 	Film** getElements() const { return elements_; }
 
