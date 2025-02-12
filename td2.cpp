@@ -110,7 +110,6 @@ Acteur* lireActeur(istream& fichier, const ListeFilms& listefilms)
 		delete acteur;
 		return acteurtrouver;
 	}
-	//acteur->joueDans = ListeFilms(); // Fuite de memoire fuck this shit took me 100 years to find i hate my life
 
 	return acteur; //TODO: Retourner un pointeur soit vers un acteur existant ou un nouvel acteur ayant les bonnes informations, selon si l'acteur existait déjà.  Pour fins de débogage, affichez les noms des acteurs crées; vous ne devriez pas voir le même nom d'acteur affiché deux fois pour la création.
 }
@@ -258,7 +257,7 @@ int main()
 	listeFilms.afficherListeFilms();
 
 	//TODO: Faire les appels qui manquent pour avoir 0% de lignes non exécutées dans le programme (aucune ligne rouge dans la couverture de code; c'est normal que les lignes de "new" et "delete" soient jaunes).  Vous avez aussi le droit d'effacer les lignes du programmes qui ne sont pas exécutée, si finalement vous pensez qu'elle ne sont pas utiles.
-
+	listeFilms.afficherFilmographieActeur("Cet acteur n'existe pas");
 	//TODO: Détruire tout avant de terminer le programme.  La bibliothèque de verification_allocation devrait afficher "Aucune fuite detectee." a la sortie du programme; il affichera "Fuite detectee:" avec la liste des blocs, s'il manque des delete.
 	listeFilms.deleteComplet();
 }
