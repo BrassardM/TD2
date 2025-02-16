@@ -93,7 +93,6 @@ Acteur* ListeFilms::trouverActeur(const string& nom) const {
 		}
 	}
 	return nullptr;
-
 }
 
 //TODO: Compléter les fonctions pour lire le fichier et créer/allouer une ListeFilms.  La ListeFilms devra être passée entre les fonctions, pour vérifier l'existence d'un Acteur avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
@@ -174,7 +173,6 @@ void detruireFilm(Film* filmDetruit) {
 
 //TODO: Une fonction pour détruire une ListeFilms et tous les films qu'elle contient.
 
-
 void ListeFilms::deleteComplet() {
 	for (unsigned i : range(0, nElements_)) {
 		detruireFilm(elements_[i]);
@@ -236,6 +234,7 @@ int main()
 
 	cout << ligneDeSeparation << "Le premier film de la liste est:" << endl;
 	//TODO: Afficher le premier film de la liste.  Devrait être Alien.
+
 	cout << listeFilms.getElements()[0]->titre;
 	cout << ligneDeSeparation << "Les films sont:" << endl;
 	//TODO: Afficher la liste des films.  Il devrait y en avoir 7.
