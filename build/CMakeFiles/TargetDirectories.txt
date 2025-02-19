@@ -1,0 +1,4 @@
+C:/my_files/cpp_hiver_2025/td2/build/CMakeFiles/ProjetTD2.dir
+C:/my_files/cpp_hiver_2025/td2/build/CMakeFiles/ProjetTD2_couverture.dir
+C:/my_files/cpp_hiver_2025/td2/build/CMakeFiles/edit_cache.dir
+C:/my_files/cpp_hiver_2025/td2/build/CMakeFiles/rebuild_cache.dir

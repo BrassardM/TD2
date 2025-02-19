@@ -1,0 +1,3 @@
+"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E rm -f CMakeFiles\ProjetTD2.dir/objects.a
+C:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\ProjetTD2.dir/objects.a @CMakeFiles\ProjetTD2.dir\objects1.rsp
+C:\msys64\ucrt64\bin\g++.exe -g --coverage -Wl,--whole-archive CMakeFiles\ProjetTD2.dir/objects.a -Wl,--no-whole-archive -o ProjetTD2.exe -Wl,--out-implib,libProjetTD2.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\ProjetTD2.dir\linkLibs.rsp

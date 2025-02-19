@@ -2,7 +2,9 @@
 // Structures mémoires pour une collection de films.
 
 #include <string>
+#include<memory>
 
+using namespace std;
 struct Film; struct Acteur; // Permet d'utiliser les types alors qu'ils seront défini après.
 
 class ListeFilms {
@@ -16,11 +18,11 @@ public:
 	Film** getElements() const { return elements_; }
 
 	void ajouterFilms(Film* filmAjout);
-	Acteur* trouverActeur(const std::string& nom) const;
+	shared_ptr<Acteur> trouverActeur(const std::string& nom) const;
 	void enleverFilm(Film* filmEnleve);
 
 	void afficherListeFilms() const;
-	void afficherFilmographieActeur(const std::string& nomActeur) const;
+	//void afficherFilmographieActeur(const std::string& nomActeur) const;
 
 	void changerActeurDateNaissance(const std::string& nomActeur, int Date);
 
@@ -34,19 +36,19 @@ public:
 
 
 struct ListeActeurs {
-	int capacite, nElements;
-	Acteur** elements; // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
+	int capacite = 1, nElements = 0;
+	unique_ptr<shared_ptr<Acteur>[]> elements = make_unique<shared_ptr<Acteur>[]>(capacite); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
 };
 
 struct Film
 {
 	std::string titre = "", realisateur = ""; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
 	int anneeSortie = 0, recette = 0; // Année de sortie et recette globale du film en millions de dollars
-	ListeActeurs acteurs = {};
+	ListeActeurs acteurs;
 };
 
 struct Acteur
 {
 	std::string nom = ""; int anneeNaissance = 0; char sexe = ' ';
-	ListeFilms joueDans;
+	//ListeFilms joueDans;
 };

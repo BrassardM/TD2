@@ -1,0 +1,20 @@
+[
+{
+  "directory": "C:/my_files/cpp_hiver_2025/td2/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe  @CMakeFiles/ProjetTD2.dir/includes_CXX.rsp -g -std=c++20 -fsigned-char -Wall -Wextra -Wpedantic -Woverloaded-virtual -Wno-unknown-pragmas -Wno-enum-compare -Wshadow --coverage -o CMakeFiles\\ProjetTD2.dir\\bibliotheque_cours\\bibliotheque_cours.cpp.obj -c C:\\my_files\\cpp_hiver_2025\\td2\\bibliotheque_cours\\bibliotheque_cours.cpp",
+  "file": "C:/my_files/cpp_hiver_2025/td2/bibliotheque_cours/bibliotheque_cours.cpp",
+  "output": "CMakeFiles/ProjetTD2.dir/bibliotheque_cours/bibliotheque_cours.cpp.obj"
+},
+{
+  "directory": "C:/my_files/cpp_hiver_2025/td2/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe  @CMakeFiles/ProjetTD2.dir/includes_CXX.rsp -g -std=c++20 -fsigned-char -Wall -Wextra -Wpedantic -Woverloaded-virtual -Wno-unknown-pragmas -Wno-enum-compare -Wshadow --coverage -o CMakeFiles\\ProjetTD2.dir\\bibliotheque_cours\\verification_allocation.cpp.obj -c C:\\my_files\\cpp_hiver_2025\\td2\\bibliotheque_cours\\verification_allocation.cpp",
+  "file": "C:/my_files/cpp_hiver_2025/td2/bibliotheque_cours/verification_allocation.cpp",
+  "output": "CMakeFiles/ProjetTD2.dir/bibliotheque_cours/verification_allocation.cpp.obj"
+},
+{
+  "directory": "C:/my_files/cpp_hiver_2025/td2/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe  @CMakeFiles/ProjetTD2.dir/includes_CXX.rsp -g -std=c++20 -fsigned-char -Wall -Wextra -Wpedantic -Woverloaded-virtual -Wno-unknown-pragmas -Wno-enum-compare -Wshadow --coverage -o CMakeFiles\\ProjetTD2.dir\\td2.cpp.obj -c C:\\my_files\\cpp_hiver_2025\\td2\\td2.cpp",
+  "file": "C:/my_files/cpp_hiver_2025/td2/td2.cpp",
+  "output": "CMakeFiles/ProjetTD2.dir/td2.cpp.obj"
+}
+]
