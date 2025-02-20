@@ -223,6 +223,11 @@ void ListeFilms::afficherListeFilms() const
 void ListeFilms::changerActeurDateNaissance(const string& nomActeur, int Date) {
 	trouverActeur(nomActeur)->anneeNaissance = Date;
 }
+// odd
+ostream& operator<<(const Film*& film, ostream& o) {
+	o << film->titre;
+	return o;
+}
 
 int main()
 {
@@ -237,6 +242,15 @@ int main()
 
 	cout << ligneDeSeparation << "Le premier film de la liste est:" << endl;
 	//TODO: Afficher le premier film de la liste.  Devrait être Alien.
+	// Une facon plus simple de faire ca
+	Film skylien;
+	skylien.anneeSortie = listeFilms.getElements()[0]->anneeSortie;
+	skylien.realisateur = listeFilms.getElements()[0]->realisateur;
+	skylien.recette = listeFilms.getElements()[0]->recette;
+	skylien.titre = listeFilms.getElements()[0]->titre;
+	skylien.acteurs.capacite = listeFilms.getElements()[0]->acteurs.capacite;
+	skylien.acteurs.nElements = listeFilms.getElements()[0]->acteurs.nElements;
+	skylien.acteurs.elements = move(listeFilms.getElements()[0]->acteurs.elements);
 
 	cout << listeFilms.getElements()[0]->titre;
 	cout << ligneDeSeparation << "Les films sont:" << endl;
