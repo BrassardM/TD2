@@ -224,9 +224,22 @@ void ListeFilms::changerActeurDateNaissance(const string& nomActeur, int Date) {
 	trouverActeur(nomActeur)->anneeNaissance = Date;
 }
 // odd
-ostream& operator<<(const Film*& film, ostream& o) {
-	o << film->titre;
-	return o;
+ostream& operator<<(ostream& os, Film*& film) {
+	os << "Titre du film: " << film->titre << endl; 
+	os << "Année de sortie du film: " << film->anneeSortie << endl;
+	os << "Recette du film: " << film->recette << endl;
+	os << "Réalisateur du film: " << film->realisateur << endl;
+	os << "Acteurs du film: " << endl;
+	for (int i : range(film->acteurs.nElements)) {
+		os << film->acteurs.elements[i].get()->nom << endl;
+	}
+	// Realisateur
+	// annee
+	// titre
+	// acteur 1
+	// acteur 2
+	// ...
+	return os;
 }
 
 int main()
@@ -243,6 +256,8 @@ int main()
 	cout << ligneDeSeparation << "Le premier film de la liste est:" << endl;
 	//TODO: Afficher le premier film de la liste.  Devrait être Alien.
 	// Une facon plus simple de faire ca
+	
+	/*
 	Film skylien;
 	skylien.anneeSortie = listeFilms.getElements()[0]->anneeSortie;
 	skylien.realisateur = listeFilms.getElements()[0]->realisateur;
@@ -250,9 +265,10 @@ int main()
 	skylien.titre = listeFilms.getElements()[0]->titre;
 	skylien.acteurs.capacite = listeFilms.getElements()[0]->acteurs.capacite;
 	skylien.acteurs.nElements = listeFilms.getElements()[0]->acteurs.nElements;
-	skylien.acteurs.elements = move(listeFilms.getElements()[0]->acteurs.elements);
+	skylien.acteurs.elements = copy(listeFilms.getElements()[0]->acteurs.elements);
+	*/
 
-	cout << listeFilms.getElements()[0]->titre;
+	cout << listeFilms.getElements()[0];
 	cout << ligneDeSeparation << "Les films sont:" << endl;
 	//TODO: Afficher la liste des films.  Il devrait y en avoir 7.
 	listeFilms.afficherListeFilms();
@@ -260,7 +276,7 @@ int main()
 	//TODO: Modifier l'année de naissance de Benedict Cumberbatch pour être 1976 (elle était 0 dans les données lues du fichier).  Vous ne pouvez pas supposer l'ordre des films et des acteurs dans les listes, il faut y aller par son nom.
 	string bCumberbatch = "Benedict Cumberbatch";
 	listeFilms.changerActeurDateNaissance(bCumberbatch, 1976);
-	cout << ligneDeSeparation << "Liste des films où Benedict Cumberbatch joue sont:" << endl;
+	//cout << ligneDeSeparation << "Liste des films où Benedict Cumberbatch joue sont:" << endl;
 	//TODO: Afficher la liste des films où Benedict Cumberbatch joue.  Il devrait y avoir Le Hobbit et Le jeu de l'imitation.
 	//listeFilms.afficherFilmographieActeur(bCumberbatch);
 	 
