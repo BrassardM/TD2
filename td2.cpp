@@ -88,7 +88,7 @@ void ListeFilms::enleverFilm(Film* filmEnleve) {
 shared_ptr<Acteur> ListeFilms::trouverActeur(const string& nom) const {
 	span<Film*> spanFilms({ elements_, long unsigned(nElements_) });
 	for (Film* film : spanFilms) {
-		span<shared_ptr<Acteur>> spanActeur({ film->acteurs.elements.get(), long unsigned(film->acteurs.nElements) });
+		span<shared_ptr<Acteur>> spanActeur = ((film->acteurs).enSpan());
 		for (shared_ptr<Acteur> m : spanActeur) {
 			if (m->nom == nom) {
 				return m;
@@ -122,14 +122,13 @@ Film* lireFilm(istream& fichier, const ListeFilms& listeFilms)
 	film->realisateur = lireString(fichier);
 	film->anneeSortie = lireUint16(fichier);
 	film->recette = lireUint16(fichier);
-	film->acteurs.nElements = lireUint8(fichier);//NOTE: Vous avez le droit d'allouer d'un coup le tableau pour les acteurs, sans faire de réallocation comme pour ListeFilms.  Vous pouvez aussi copier-coller les fonctions d'allocation de ListeFilms ci-dessus dans des nouvelles fonctions et faire un remplacement de Film par Acteur, pour réutiliser cette réallocation.
-	film->acteurs.capacite = film->acteurs.nElements;
-	shared_ptr<Acteur> acteurPtr = make_shared<Acteur>();
-	unique_ptr<shared_ptr<Acteur>[]> acteurElements = make_unique<shared_ptr<Acteur>[]>(film->acteurs.nElements);
-	film->acteurs.elements = move(acteurElements);
+	int nElements = lireUint8(fichier);
+	ListeActeurs listeActeurs(nElements, nElements);
+	film->acteurs = listeActeurs;
 
-	for (int i = 0; i < film->acteurs.nElements; i++) {
-		film->acteurs.elements[i] = lireActeur(fichier, listeFilms); //TODO: Placer l'acteur au bon endroit dans les acteurs du film.
+	for (int i = 0; i < nElements; i++) {
+		shared_ptr<Acteur> Acteur = lireActeur(fichier, listeFilms); //TODO: Placer l'acteur au bon endroit dans les acteurs du film.
+		film->acteurs.ajouter(Acteur, i);
 		//film->acteurs.elements[i]->joueDans.ajouterFilms(film); //TODO: Ajouter le film à la liste des films dans lesquels l'acteur joue.
 	}
 	return film; //TODO: Retourner le pointeur vers le nouveau film.
@@ -205,7 +204,7 @@ void ListeFilms::afficherListeFilms() const
 	for (Film* n : spanfilm) {
 		//TODO: Afficher le film.
 		cout << ligneDeSeparation << n->titre << endl;
-		span<shared_ptr<Acteur>> spanActeur({ n->acteurs.elements.get(), long unsigned(n->acteurs.nElements) });
+		span<shared_ptr<Acteur>> spanActeur = (n->acteurs).enSpan();
 		for (shared_ptr<Acteur> m : spanActeur) {
 			afficherActeur(*m);
 		}
@@ -232,8 +231,10 @@ ostream& operator<<(ostream& os, const Film& film) {
 	os << "Recette du film: " << film.recette << endl;
 	os << "Réalisateur du film: " << film.realisateur << endl;
 	os << "Acteurs du film: " << endl;
-	for (int i : range(film.acteurs.nElements)) {
-		os << film.acteurs.elements[i].get()->nom << endl;
+
+	span<shared_ptr<Acteur>> spanActeur = film.acteurs.enSpan();
+	for (auto n : spanActeur) {
+		os << n.get()->nom << endl;
 	}
 	return os;
 }
@@ -265,8 +266,28 @@ int main()
 	cout << *listeFilms[0];
 
 	//TODO: Afficher le premier film de la liste.  Devrait être Alien.
-	
+	cout << ligneDeSeparation << "Sklien, Alien et listeFilms[1] modifiee:" << endl;
 
+	Film skylien = *listeFilms[0];
+	skylien.titre = "Skylien";
+
+	// FONCTION AJOUTER
+	(skylien.acteurs).ajouter(listeFilms[1]->acteurs[0], 0);
+	skylien.acteurs[0]->nom = "Daniel Wroughton Craig";
+
+	cout << "  -- SKYLIEN -- " << endl;
+	cout << skylien;
+	cout << "  -- Alien -- " << endl;
+	cout << *listeFilms[0];
+	cout << "  -- ListeFilms[1] -- " << endl;
+	cout << *listeFilms[1];
+
+	cout << ligneDeSeparation << "Fonction Lambda avec critere : " << endl;
+	int recetteAObtenir = 955;
+	auto critere = [&](Film* pFilm) -> bool {
+		if (pFilm->recette == recetteAObtenir) { return true; }
+		else { return false; } };
+	cout << *(listeFilms.getFilmParCritere(critere)) << endl;
 
 
 	cout << ligneDeSeparation << "Les films sont:" << endl;
@@ -290,42 +311,23 @@ int main()
 	//TODO: Faire les appels qui manquent pour avoir 0% de lignes non exécutées dans le programme (aucune ligne rouge dans la couverture de code; c'est normal que les lignes de "new" et "delete" soient jaunes).  Vous avez aussi le droit d'effacer les lignes du programmes qui ne sont pas exécutée, si finalement vous pensez qu'elle ne sont pas utiles.
 	//listeFilms.afficherFilmographieActeur("Cet acteur n'existe pas");
 
-	//MODIFICATION DES FILMS
-	cout << ligneDeSeparation << "Sklien, Alien et listeFilms[1] modifiee:" << endl;
-
-	Film skylien = *listeFilms[0];
-	skylien.titre = "Skylien";
-	skylien.acteurs.elements[0] = listeFilms[1]->acteurs.elements[0];
-	skylien.acteurs.elements[0]->nom = "Daniel Wroughton Craig";
-	cout << "  -- SKYLIEN -- " << endl;
-	cout << skylien;
-	cout << "  -- Alien -- " << endl;
-	cout << *listeFilms[0];
-	cout << "  -- ListeFilms[1] -- " << endl;
-	cout << *listeFilms[1];
-
-	cout << ligneDeSeparation << "Fonction critere avec LAMBDA: " << endl;
-	int recetteAObtenir = 955;
-	auto critere = [&](Film* pFilm) -> bool {
-		if (pFilm->recette == recetteAObtenir) { return true; }
-		else { return false; } };
-	cout << *(listeFilms.getFilmParCritere(critere)) << endl;
-
-
 	// LISTE TEXTE
 	Liste<string> listeTextes(4, 2);
-	listeTextes[0] = "abcdef";
-	listeTextes[1] = "123456";
+	*(listeTextes[0]) = "ABCDEF";
+	*(listeTextes[1]) = "123456";
 	Liste<string> listeTextes2 = listeTextes;
 	shared_ptr<string> pString = make_shared<string>("ZXYWVUT");
-	listeTextes2.elements[0] = pString;
-	listeTextes[1] = "987654";
 
-	cout << endl << "LISTETEXTES[0] : " << listeTextes[0] << endl;
-	cout << "LISTETEXTES[0] : " << listeTextes[1] << endl;
+	// Ajouter FONCTION
+	listeTextes2.ajouter(pString, 0);
 
-	cout << "LISTETEXTES2[0] : " << listeTextes2[0] << endl;
-	cout << "LISTETEXTES2[1] : " << listeTextes2[1] << endl;
+	*listeTextes[1] = "987654";
+
+	cout << endl << "LISTETEXTES[0] : " << *listeTextes[0] << endl;
+	cout << "LISTETEXTES[0] : " << *listeTextes[1] << endl;
+
+	cout << "LISTETEXTES2[0] : " << *listeTextes2[0] << endl;
+	cout << "LISTETEXTES2[1] : " << *listeTextes2[1] << endl;
 
 
 	//TODO: Détruire tout avant de terminer le programme.  La bibliothèque de verification_allocation devrait afficher "Aucune fuite detectee." a la sortie du programme; il affichera "Fuite detectee:" avec la liste des blocs, s'il manque des delete.
