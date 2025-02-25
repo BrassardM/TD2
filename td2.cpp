@@ -313,18 +313,18 @@ int main()
 
 	// LISTE TEXTE
 	Liste<string> listeTextes(4, 2);
-	*(listeTextes[0]) = "ABCDEF";
-	*(listeTextes[1]) = "123456";
+	*(listeTextes[0]) = "liste texte entree 0";
+	*(listeTextes[1]) = "liste texte entree 1";
 	Liste<string> listeTextes2 = listeTextes;
-	shared_ptr<string> pString = make_shared<string>("ZXYWVUT");
+	shared_ptr<string> pString = make_shared<string>("ajout d'un pointeur shared dans la liste texte 2");
 
 	// Ajouter FONCTION
 	listeTextes2.ajouter(pString, 0);
 
-	*listeTextes[1] = "987654";
+	*listeTextes[1] = "modification de l'entree 1 de la liste de texte 2 (devrait affecter la liste 1 aussi)";
 
 	cout << endl << "LISTETEXTES[0] : " << *listeTextes[0] << endl;
-	cout << "LISTETEXTES[0] : " << *listeTextes[1] << endl;
+	cout << "LISTETEXTES[1] : " << *listeTextes[1] << endl;
 
 	cout << "LISTETEXTES2[0] : " << *listeTextes2[0] << endl;
 	cout << "LISTETEXTES2[1] : " << *listeTextes2[1] << endl;
