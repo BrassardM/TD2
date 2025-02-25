@@ -10,12 +10,14 @@
 #include <algorithm>
 #include <span>
 #include<memory>
+#include <functional>
 
 #include "cppitertools/range.hpp"
 
 #include "bibliotheque_cours.hpp"
 #include "verification_allocation.hpp" // Nos fonctions pour le rapport de fuites de mémoire.
 #include "debogage_memoire.hpp"        // Ajout des numéros de ligne des "new" dans le rapport de fuites.  Doit être après les include du système, qui peuvent utiliser des "placement new" (non supporté par notre ajout de numéros de lignes).
+
 
 using namespace std;
 using namespace iter;
@@ -86,8 +88,8 @@ void ListeFilms::enleverFilm(Film* filmEnleve) {
 shared_ptr<Acteur> ListeFilms::trouverActeur(const string& nom) const {
 	span<Film*> spanFilms({ elements_, long unsigned(nElements_) });
 	for (Film* film : spanFilms) {
-		span<shared_ptr<Acteur>> spanActeur({film->acteurs.elements.get(), long unsigned(film->acteurs.nElements)});
-		for (shared_ptr<Acteur> m : spanActeur ) {
+		span<shared_ptr<Acteur>> spanActeur({ film->acteurs.elements.get(), long unsigned(film->acteurs.nElements) });
+		for (shared_ptr<Acteur> m : spanActeur) {
 			if (m->nom == nom) {
 				return m;
 			}
@@ -161,7 +163,7 @@ ListeFilms::ListeFilms() {
 
 void detruireFilm(Film* filmDetruit) {
 	/*for (unsigned i : range(0, filmDetruit->acteurs.nElements)) {
-		
+
 		if (filmDetruit->acteurs.elements[i]->joueDans.getnElements() > 1) {
 			(filmDetruit->acteurs.elements[i]->joueDans).enleverFilm(filmDetruit);
 		}
@@ -203,7 +205,7 @@ void ListeFilms::afficherListeFilms() const
 	for (Film* n : spanfilm) {
 		//TODO: Afficher le film.
 		cout << ligneDeSeparation << n->titre << endl;
-		span<shared_ptr<Acteur>> spanActeur({ n->acteurs.elements.get(), long unsigned(n->acteurs.nElements)});
+		span<shared_ptr<Acteur>> spanActeur({ n->acteurs.elements.get(), long unsigned(n->acteurs.nElements) });
 		for (shared_ptr<Acteur> m : spanActeur) {
 			afficherActeur(*m);
 		}
@@ -224,27 +226,25 @@ void ListeFilms::changerActeurDateNaissance(const string& nomActeur, int Date) {
 	trouverActeur(nomActeur)->anneeNaissance = Date;
 }
 // odd
-ostream& operator<<(ostream& os, Film*& film) {
-	os << "Titre du film: " << film->titre << endl; 
-	os << "Année de sortie du film: " << film->anneeSortie << endl;
-	os << "Recette du film: " << film->recette << endl;
-	os << "Réalisateur du film: " << film->realisateur << endl;
+ostream& operator<<(ostream& os, const Film& film) {
+	os << "Titre du film: " << film.titre << endl;
+	os << "Année de sortie du film: " << film.anneeSortie << endl;
+	os << "Recette du film: " << film.recette << endl;
+	os << "Réalisateur du film: " << film.realisateur << endl;
 	os << "Acteurs du film: " << endl;
-	for (int i : range(film->acteurs.nElements)) {
-		os << film->acteurs.elements[i].get()->nom << endl;
+	for (int i : range(film.acteurs.nElements)) {
+		os << film.acteurs.elements[i].get()->nom << endl;
 	}
-	// Realisateur
-	// annee
-	// titre
-	// acteur 1
-	// acteur 2
-	// ...
 	return os;
 }
 
-ostream& operator<<(ostream& os, Film* const& film) {
-	os << film->titre;
-	return os;
+Film* ListeFilms::getFilmParCritere(const function<bool(Film*)>& critere) {
+	for (unsigned i = 0; i < nElements_; i += 1) {
+		if (critere(elements_[i])) {
+			return elements_[i];
+		}
+	}
+	return nullptr;
 }
 
 int main()
@@ -261,19 +261,14 @@ int main()
 	cout << ligneDeSeparation << "Le premier film de la liste est:" << endl;
 	//TODO: Afficher le premier film de la liste.  Devrait être Alien.
 	// Une facon plus simple de faire ca
-	
-	/*
-	Film skylien;
-	skylien.anneeSortie = listeFilms.getElements()[0]->anneeSortie;
-	skylien.realisateur = listeFilms.getElements()[0]->realisateur;
-	skylien.recette = listeFilms.getElements()[0]->recette;
-	skylien.titre = listeFilms.getElements()[0]->titre;
-	skylien.acteurs.capacite = listeFilms.getElements()[0]->acteurs.capacite;
-	skylien.acteurs.nElements = listeFilms.getElements()[0]->acteurs.nElements;
-	skylien.acteurs.elements = copy(listeFilms.getElements()[0]->acteurs.elements);
-	*/
 
-	cout << listeFilms.getElements()[0];
+	cout << *listeFilms[0];
+
+	//TODO: Afficher le premier film de la liste.  Devrait être Alien.
+	
+
+
+
 	cout << ligneDeSeparation << "Les films sont:" << endl;
 	//TODO: Afficher la liste des films.  Il devrait y en avoir 7.
 	listeFilms.afficherListeFilms();
@@ -284,7 +279,7 @@ int main()
 	//cout << ligneDeSeparation << "Liste des films où Benedict Cumberbatch joue sont:" << endl;
 	//TODO: Afficher la liste des films où Benedict Cumberbatch joue.  Il devrait y avoir Le Hobbit et Le jeu de l'imitation.
 	//listeFilms.afficherFilmographieActeur(bCumberbatch);
-	 
+
 	//TODO: Détruire et enlever le premier film de la liste (Alien).  Ceci devrait "automatiquement" (par ce que font vos fonctions) détruire les acteurs Tom Skerritt et John Hurt, mais pas Sigourney Weaver puisqu'elle joue aussi dans Avatar.
 	detruireFilm(listeFilms.getElements()[0]);
 	listeFilms.enleverFilm(listeFilms.getElements()[0]);
@@ -294,6 +289,45 @@ int main()
 	//listeFilms.afficherFilmographieActeur("Acteur qui n'existe pas");
 	//TODO: Faire les appels qui manquent pour avoir 0% de lignes non exécutées dans le programme (aucune ligne rouge dans la couverture de code; c'est normal que les lignes de "new" et "delete" soient jaunes).  Vous avez aussi le droit d'effacer les lignes du programmes qui ne sont pas exécutée, si finalement vous pensez qu'elle ne sont pas utiles.
 	//listeFilms.afficherFilmographieActeur("Cet acteur n'existe pas");
+
+	//MODIFICATION DES FILMS
+	cout << ligneDeSeparation << "Sklien, Alien et listeFilms[1] modifiee:" << endl;
+
+	Film skylien = *listeFilms[0];
+	skylien.titre = "Skylien";
+	skylien.acteurs.elements[0] = listeFilms[1]->acteurs.elements[0];
+	skylien.acteurs.elements[0]->nom = "Daniel Wroughton Craig";
+	cout << "  -- SKYLIEN -- " << endl;
+	cout << skylien;
+	cout << "  -- Alien -- " << endl;
+	cout << *listeFilms[0];
+	cout << "  -- ListeFilms[1] -- " << endl;
+	cout << *listeFilms[1];
+
+	cout << ligneDeSeparation << "Fonction critere avec LAMBDA: " << endl;
+	int recetteAObtenir = 955;
+	auto critere = [&](Film* pFilm) -> bool {
+		if (pFilm->recette == recetteAObtenir) { return true; }
+		else { return false; } };
+	cout << *(listeFilms.getFilmParCritere(critere)) << endl;
+
+
+	// LISTE TEXTE
+	Liste<string> listeTextes(4, 2);
+	listeTextes[0] = "abcdef";
+	listeTextes[1] = "123456";
+	Liste<string> listeTextes2 = listeTextes;
+	shared_ptr<string> pString = make_shared<string>("ZXYWVUT");
+	listeTextes2.elements[0] = pString;
+	listeTextes[1] = "987654";
+
+	cout << endl << "LISTETEXTES[0] : " << listeTextes[0] << endl;
+	cout << "LISTETEXTES[0] : " << listeTextes[1] << endl;
+
+	cout << "LISTETEXTES2[0] : " << listeTextes2[0] << endl;
+	cout << "LISTETEXTES2[1] : " << listeTextes2[1] << endl;
+
+
 	//TODO: Détruire tout avant de terminer le programme.  La bibliothèque de verification_allocation devrait afficher "Aucune fuite detectee." a la sortie du programme; il affichera "Fuite detectee:" avec la liste des blocs, s'il manque des delete.
 	listeFilms.deleteComplet();
 }
