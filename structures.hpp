@@ -25,7 +25,7 @@ public:
 	//void afficherFilmographieActeur(const std::string& nomActeur) const;
 
 	void changerActeurDateNaissance(const std::string& nomActeur, int Date);
-
+	Film operator[](int index);
 	void deleteComplet();
 	void deleteElements();
 

@@ -224,22 +224,30 @@ void ListeFilms::changerActeurDateNaissance(const string& nomActeur, int Date) {
 	trouverActeur(nomActeur)->anneeNaissance = Date;
 }
 // odd
-ostream& operator<<(ostream& os, Film*& film) {
-	os << "Titre du film: " << film->titre << endl; 
-	os << "Année de sortie du film: " << film->anneeSortie << endl;
-	os << "Recette du film: " << film->recette << endl;
-	os << "Réalisateur du film: " << film->realisateur << endl;
+ostream& operator<<(ostream& os, Film& film) {
+	os << "Titre du film: " << film.titre << endl; 
+	os << "Année de sortie du film: " << film.anneeSortie << endl;
+	os << "Recette du film: " << film.recette << endl;
+	os << "Réalisateur du film: " << film.realisateur << endl;
 	os << "Acteurs du film: " << endl;
-	for (int i : range(film->acteurs.nElements)) {
-		os << film->acteurs.elements[i].get()->nom << endl;
+	for (int i : range(film.acteurs.nElements)) {
+		os << film.acteurs.elements[i].get()->nom << endl;
 	}
-	// Realisateur
-	// annee
-	// titre
-	// acteur 1
-	// acteur 2
-	// ...
 	return os;
+}
+Film ListeFilms::operator[](int index) {
+	Film film;
+	film.anneeSortie = elements_[index]->anneeSortie;
+	film.realisateur = elements_[index]->realisateur;
+	film.recette = elements_[index]->recette;
+	film.titre = elements_[index]->titre;
+	film.acteurs.capacite = elements_[index]->acteurs.capacite;
+	film.acteurs.nElements = elements_[index]->acteurs.nElements;
+	film.acteurs.elements = make_unique<shared_ptr<Acteur>[]>(film.acteurs.capacite);
+	for (int i : range(film.acteurs.capacite)) {
+		film.acteurs.elements[i] = elements_[index]->acteurs.elements[i];
+	}
+	return film;
 }
 
 int main()
@@ -252,7 +260,6 @@ int main()
 
 	//TODO: La ligne suivante devrait lire le fichier binaire en allouant la mémoire nécessaire.  Devrait afficher les noms de 20 acteurs sans doublons (par l'affichage pour fins de débogage dans votre fonction lireActeur).
 	ListeFilms listeFilms("films.bin");
-
 	cout << ligneDeSeparation << "Le premier film de la liste est:" << endl;
 	//TODO: Afficher le premier film de la liste.  Devrait être Alien.
 	// Une facon plus simple de faire ca
@@ -267,8 +274,13 @@ int main()
 	skylien.acteurs.nElements = listeFilms.getElements()[0]->acteurs.nElements;
 	skylien.acteurs.elements = copy(listeFilms.getElements()[0]->acteurs.elements);
 	*/
-
-	cout << listeFilms.getElements()[0];
+	Film skylien = listeFilms[0];
+	skylien.titre = "skylien";
+	skylien.acteurs.elements[0] = listeFilms[1].acteurs.elements[0];
+	skylien.acteurs.elements[0].get()->nom = "Daniel Wroughton Craig";
+	cout << skylien<<endl;
+	cout << *listeFilms.getElements()[0];
+	cout << *listeFilms.getElements()[1];
 	cout << ligneDeSeparation << "Les films sont:" << endl;
 	//TODO: Afficher la liste des films.  Il devrait y en avoir 7.
 	listeFilms.afficherListeFilms();
