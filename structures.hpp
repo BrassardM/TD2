@@ -64,38 +64,33 @@ public:
 			elements[i] = make_shared<T>(T{});
 		}
 	}
-	Liste(const Liste& toCopy) {
-		capacite = toCopy.capacite;
-		nElements = toCopy.nElements;
-		elements = make_unique<shared_ptr<T>[]>(capacite); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
-		for (unsigned i = 0; i < capacite; i++) {
-			elements.get()[i] = toCopy.elements.get()[i];
-		}
-	}
-
 	void operator=(Liste<T>& toCopy) {
 		capacite = toCopy.capacite;
 		nElements = toCopy.nElements;
 		elements = make_unique<shared_ptr<T>[]>(capacite); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
 		for (unsigned i = 0; i < capacite; i++) {
-			elements.get()[i] = toCopy.elements.get()[i];
+			elements[i] = toCopy.elements[i];
 		}
 	}
-
+	Liste(const Liste& toCopy) {
+		capacite = toCopy.capacite;
+		nElements = toCopy.nElements;
+		elements = make_unique<shared_ptr<T>[]>(capacite); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
+		for (unsigned i = 0; i < capacite; i++) {
+			elements[i] = toCopy.elements[i];
+		}
+	}
 	span<shared_ptr<T>> enSpan() const {
 		long unsigned nUns = nElements;
 		span<shared_ptr<T>> spanActeur({ elements.get(), nUns });
 		return spanActeur;
 	}
-
 	shared_ptr<T> operator[](int index) {
 		return elements[index];
 	}
-
 	void ajouter(shared_ptr<T> ajout, int index) {
 		elements[index] = ajout;
 	}
-
 };
 using ListeActeurs = Liste<Acteur>;
 
