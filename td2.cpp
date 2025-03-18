@@ -320,6 +320,7 @@ int main()
 		contenuLivres.push_back(livre);
 	} while (getline(livre, str));
 	// Why here gives me error de construction de LivreFilm?
+	// Est ce qu'il faut convertir contenu de vecteur d'Item en Livre et Film?
 	//FilmLivre filmLivre(contenuLivres[2], vecteurFilms[2]);
 
 	//TODO: Détruire et enlever le premier film de la liste (Alien).  Ceci devrait "automatiquement" (par ce que font vos fonctions) détruire les acteurs Tom Skerritt et John Hurt, mais pas Sigourney Weaver puisqu'elle joue aussi dans Avatar.
