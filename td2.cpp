@@ -4,6 +4,7 @@
 #include "structures.hpp"      // Structures de données pour la collection de films en mémoire.
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 #include <limits>
@@ -248,6 +249,7 @@ Film* ListeFilms::getFilmParCritere(const function<bool(Film*)>& critere) {
 	return nullptr;
 }
 
+
 int main()
 {
 	bibliotheque_cours::activerCouleursAnsi();  // Permet sous Windows les "ANSI escape code" pour changer de couleurs https://en.wikipedia.org/wiki/ANSI_escape_code ; les consoles Linux/Mac les supportent normalement par défaut.
@@ -300,6 +302,25 @@ int main()
 	//cout << ligneDeSeparation << "Liste des films où Benedict Cumberbatch joue sont:" << endl;
 	//TODO: Afficher la liste des films où Benedict Cumberbatch joue.  Il devrait y avoir Le Hobbit et Le jeu de l'imitation.
 	//listeFilms.afficherFilmographieActeur(bCumberbatch);
+
+	// On fait quoi avec detruire, changerActeurDateNaissance, etc. si on nous dit d'effacer listeFilms apres creation de vecteur?
+	vector<Item> vecteurFilms;
+	for (int i : range(listeFilms.getnElements())) {
+		vecteurFilms.push_back(*(listeFilms.getElements()[i]));
+	}
+	ifstream livre("livres.txt");
+	
+	string str;
+	vector<Item> contenuLivres;
+	do {
+		string titre, auteur;
+		int annee, millionsCopies, nbPages;
+		livre >> quoted(titre) >> annee >> quoted(auteur) >> millionsCopies >> nbPages;
+		Livre livre(titre, annee, auteur, millionsCopies, nbPages);
+		contenuLivres.push_back(livre);
+	} while (getline(livre, str));
+	// Why here gives me error de construction de LivreFilm?
+	//FilmLivre filmLivre(contenuLivres[2], vecteurFilms[2]);
 
 	//TODO: Détruire et enlever le premier film de la liste (Alien).  Ceci devrait "automatiquement" (par ce que font vos fonctions) détruire les acteurs Tom Skerritt et John Hurt, mais pas Sigourney Weaver puisqu'elle joue aussi dans Avatar.
 	detruireFilm(listeFilms.getElements()[0]);

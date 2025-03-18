@@ -94,21 +94,42 @@ public:
 };
 using ListeActeurs = Liste<Acteur>;
 
-struct Film
+//  Qu'est ce qu'on devrait mettre dans Affichable?
+struct Affichable {
+public:
+
+};
+
+struct Item {
+	Item(): titre(""), anneeSortie(0) {};
+	Item(string titreDonnee, int annee):titre(titreDonnee), anneeSortie(annee) {};
+	Item(const Item& autre):titre(autre.titre),anneeSortie(autre.anneeSortie) {};
+	string titre;
+	int anneeSortie;
+};
+
+// On doit changer Film, Livre et Item en classe? Quelle numero dit ca?
+struct Film: virtual public Item
 {
-	std::string titre = "", realisateur = ""; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
-	int anneeSortie = 0, recette = 0; // Année de sortie et recette globale du film en millions de dollars
+	std::string realisateur = ""; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
+	int recette = 0; // Année de sortie et recette globale du film en millions de dollars
 	ListeActeurs acteurs;
 
-	Film() {
-		titre = "";
-		realisateur = ""; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
-		anneeSortie = 0;
-		recette = 0; // Année de sortie et recette globale du film en millions de dollars
-		acteurs;
-	}
+	Film() :realisateur(""), recette(0) {};
 
-	struct Film(const Film& toCopy) : titre(toCopy.titre), realisateur(toCopy.realisateur), anneeSortie(toCopy.anneeSortie), recette(toCopy.recette), acteurs(toCopy.acteurs) {}
+	struct Film(const Film& toCopy) : Item(toCopy.titre, toCopy.anneeSortie),realisateur(toCopy.realisateur), recette(toCopy.recette), acteurs(toCopy.acteurs) {}
+};
+struct Livre: virtual public Item {
+	Livre() : auteur(""), millionsCopiesVendues(0), nbPages(0) {};
+	Livre(string titre, int annee, string auteurDonnee, int millionsEnVente, int nbPagesDonnees): Item(titre, annee), auteur(auteurDonnee),
+		millionsCopiesVendues(millionsEnVente), nbPages(nbPagesDonnees){};
+	Livre(const Livre& autre): Item(autre.titre, autre.anneeSortie), auteur(autre.auteur), millionsCopiesVendues(autre.millionsCopiesVendues), nbPages(autre.nbPages) {}
+	string auteur; 
+	int millionsCopiesVendues, nbPages;
+};
+// Comment on devrait faire constructeur de LivreFilm?
+struct FilmLivre: public Film, public Livre {
+	FilmLivre(const Livre& livre, const Film& film):Livre(livre),Film(film) {};
 };
 
 struct Acteur
