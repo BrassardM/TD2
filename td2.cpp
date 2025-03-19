@@ -7,10 +7,8 @@
 #include <iomanip>
 #include <fstream>
 #include <string>
-#include <limits>
-#include <algorithm>
 #include <span>
-#include<memory>
+#include <memory>
 #include <functional>
 #include <vector>
 
@@ -162,15 +160,7 @@ ListeFilms::ListeFilms() {
 //TODO: Une fonction pour détruire un film (relâcher toute la mémoire associée à ce film, et les acteurs qui ne jouent plus dans aucun films de la collection).  Noter qu'il faut enleve le film détruit des films dans lesquels jouent les acteurs.  Pour fins de débogage, affichez les noms des acteurs lors de leur destruction.
 
 void detruireFilm(Film* filmDetruit) {
-	/*for (unsigned i : range(0, filmDetruit->acteurs.nElements)) {
 
-		if (filmDetruit->acteurs.elements[i]->joueDans.getnElements() > 1) {
-			(filmDetruit->acteurs.elements[i]->joueDans).enleverFilm(filmDetruit);
-		}
-		else {
-			delete filmDetruit->acteurs.elements[i];
-		}
-	}*/
 	delete filmDetruit;
 }
 
@@ -211,15 +201,7 @@ void ListeFilms::afficherListeFilms() const
 		}
 	}
 }
-/*void ListeFilms::afficherFilmographieActeur(const string& nomActeur) const
-{
-	//TODO: Utiliser votre fonction pour trouver l'acteur (au lieu de le mettre à nullptr).
-	const shared_ptr<Acteur> acteur = trouverActeur(nomActeur);
-	if (acteur == nullptr)
-		cout << "Aucun acteur de ce nom" << endl;
-	else
-		acteur->joueDans.afficherListeFilms();
-}*/
+
 
 void ListeFilms::changerActeurDateNaissance(const string& nomActeur, int Date) {
 	trouverActeur(nomActeur)->anneeNaissance = Date;
@@ -282,76 +264,5 @@ int main()
 	afficherVecteur(vectorItems);
 
 
-	//cout << ligneDeSeparation << "Le premier film de la liste est:" << endl;
-	////TODO: Afficher le premier film de la liste.  Devrait être Alien.
-	//// Une facon plus simple de faire ca
-
-	//cout << *vectorFilms[0];
-
-	////TODO: Afficher le premier film de la liste.  Devrait être Alien.
-	//cout << ligneDeSeparation << "Sklien, Alien et listeFilms[1] modifiee:" << endl;
-
-	//Film skylien = *listeFilms[0];
-	//skylien.modifierTitre("Skylien");
-
-	//// FONCTION AJOUTER
-	//skylien.ajouterEtModifierPremierActeur(listeFilms[1], 0, "Daniel Wroughton Craig");
-
-	//cout << "  -- SKYLIEN -- " << endl;
-	//cout << skylien;
-	//cout << "  -- Alien -- " << endl;
-	//cout << *listeFilms[0];
-	//cout << "  -- ListeFilms[1] -- " << endl;
-	//cout << *listeFilms[1];
-
-	//cout << ligneDeSeparation << "Fonction Lambda avec critere : " << endl;
-	//int recetteAObtenir = 955;
-	//auto critere = [&](Film* pFilm) -> bool {
-	//	if (pFilm->compareRecette(recetteAObtenir)) { return true; }
-	//	else { return false; } };
-	//cout << *(listeFilms.getFilmParCritere(critere)) << endl;
-
-
-	//cout << ligneDeSeparation << "Les films sont:" << endl;
-	////TODO: Afficher la liste des films.  Il devrait y en avoir 7.
-	//listeFilms.afficherListeFilms();
-
-	////TODO: Modifier l'année de naissance de Benedict Cumberbatch pour être 1976 (elle était 0 dans les données lues du fichier).  Vous ne pouvez pas supposer l'ordre des films et des acteurs dans les listes, il faut y aller par son nom.
-	//string bCumberbatch = "Benedict Cumberbatch";
-	//listeFilms.changerActeurDateNaissance(bCumberbatch, 1976);
-	////cout << ligneDeSeparation << "Liste des films où Benedict Cumberbatch joue sont:" << endl;
-	////TODO: Afficher la liste des films où Benedict Cumberbatch joue.  Il devrait y avoir Le Hobbit et Le jeu de l'imitation.
-	////listeFilms.afficherFilmographieActeur(bCumberbatch);
-
-	////TODO: Détruire et enlever le premier film de la liste (Alien).  Ceci devrait "automatiquement" (par ce que font vos fonctions) détruire les acteurs Tom Skerritt et John Hurt, mais pas Sigourney Weaver puisqu'elle joue aussi dans Avatar.
-	//detruireFilm(listeFilms.getElements()[0]);
-	//listeFilms.enleverFilm(listeFilms.getElements()[0]);
-	//cout << ligneDeSeparation << "Les films sont maintenant:" << endl;
-	////TODO: Afficher la liste des films.
-	//listeFilms.afficherListeFilms();
-	////listeFilms.afficherFilmographieActeur("Acteur qui n'existe pas");
-	////TODO: Faire les appels qui manquent pour avoir 0% de lignes non exécutées dans le programme (aucune ligne rouge dans la couverture de code; c'est normal que les lignes de "new" et "delete" soient jaunes).  Vous avez aussi le droit d'effacer les lignes du programmes qui ne sont pas exécutée, si finalement vous pensez qu'elle ne sont pas utiles.
-	////listeFilms.afficherFilmographieActeur("Cet acteur n'existe pas");
-
-	//// LISTE TEXTE
-	//Liste<string> listeTextes(4, 2);
-	//*(listeTextes[0]) = "liste texte entree 0";
-	//*(listeTextes[1]) = "liste texte entree 1";
-	//Liste<string> listeTextes2 = listeTextes;
-	//shared_ptr<string> pString = make_shared<string>("ajout d'un pointeur shared dans la liste texte 2");
-
-	//// Ajouter FONCTION
-	//listeTextes2.ajouter(pString, 0);
-
-	//*listeTextes[1] = "modification de l'entree 1 de la liste de texte 2 (devrait affecter la liste 1 aussi)";
-
-	//cout << endl << "LISTETEXTES[0] : " << *listeTextes[0] << endl;
-	//cout << "LISTETEXTES[1] : " << *listeTextes[1] << endl;
-
-	//cout << "LISTETEXTES2[0] : " << *listeTextes2[0] << endl;
-	//cout << "LISTETEXTES2[1] : " << *listeTextes2[1] << endl;
-
-
-	//TODO: Détruire tout avant de terminer le programme.  La bibliothèque de verification_allocation devrait afficher "Aucune fuite detectee." a la sortie du programme; il affichera "Fuite detectee:" avec la liste des blocs, s'il manque des delete.
 	listeFilms.deleteComplet();
 }

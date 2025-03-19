@@ -2,7 +2,7 @@
 // Structures mémoires pour une collection de films.
 
 #include <string>
-#include<memory>
+#include <memory>
 #include <iostream>
 #include <functional>
 #include <span>
@@ -147,7 +147,6 @@ public:
 	}
 	friend shared_ptr<Acteur> ListeFilms::trouverActeur(const std::string& nom) const;
 	friend Film* lireFilm(istream& fichier, const ListeFilms& listeFilms);
-	//struct Film(const Film& toCopy) : Item(static_cast<Item>(toCopy)), realisateur(toCopy.realisateur), recette(toCopy.recette), acteurs(toCopy.acteurs) {}
 	void ajouterEtModifierPremierActeur(Film* film, int index, string nouveauNom) {
 		acteurs.ajouter(film->acteurs[0], index);
 		acteurs[index]->nom = nouveauNom;
@@ -157,12 +156,13 @@ public:
 	}
 	void afficher(ostream& os) const override {
 		Item::afficher(os);
-		os << " Realisateur : " << realisateur << endl << " Recette : " << recette << "M$" << endl << " Liste des Acteurs: " << endl;
+		os << " Realisateur : " << realisateur << endl << " Recette : " << recette << "M$" << endl << " Liste des Acteurs : " << endl;
 		span<shared_ptr<Acteur>> spanActeur = acteurs.enSpan();
 		int i{};
 		for (auto n : spanActeur) {
-			os << "Acteur #" << ++i << "." << endl << "\tNom: " << n.get()->nom << endl << "\tAnnee de naissance: " << n.get()->anneeNaissance << endl << "\tSexe (big pause): " << n.get()->sexe << endl << endl;
+			os << "Acteur #" << ++i << "." << endl << "\tNom : " << n.get()->nom << endl << "\tAnnee de naissance : " << n.get()->anneeNaissance << endl << "\tSexe : " << n.get()->sexe << endl;
 		}
+		os << endl;
 	}
 };
 
@@ -178,7 +178,7 @@ public:
 	Livre(const Livre& autre) : Item(static_cast<Item>(autre)), auteur(autre.auteur), copies(autre.copies), nombrePages(autre.nombrePages) {}
 	void afficher(ostream& os) const override {
 		Item::afficher(os);
-		os << " Auteur: " << auteur << endl << " Copies vendues: " << copies << "M" << endl << " Nombre de pages: " << nombrePages << endl << endl;
+		os << " Auteur : " << auteur << endl << " Copies vendues : " << copies << "M" << endl << " Nombre de pages : " << nombrePages << endl << endl;
 	}
 };
 
