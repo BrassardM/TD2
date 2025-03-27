@@ -11,6 +11,7 @@
 #include <memory>
 #include <functional>
 #include <vector>
+#include <forward_list>
 
 #include "cppitertools/range.hpp"
 
@@ -50,6 +51,10 @@ string lireString(istream& fichier)
 }
 
 #pragma endregion//}
+
+// C'est ici les constantes globales?
+static const string ligneDeSeparation = "\n\033[35m════════════════════════════════════════\033[0m\n";
+
 
 //TODO: Une fonction pour ajouter un Film à une ListeFilms, le film existant déjà; on veut uniquement ajouter le pointeur vers le film existant.  Cette fonction doit doubler la taille du tableau alloué, avec au minimum un élément, dans le cas où la capacité est insuffisante pour ajouter l'élément.  Il faut alors allouer un nouveau tableau plus grand, copier ce qu'il y avait dans l'ancien, et éliminer l'ancien trop petit.  Cette fonction ne doit copier aucun Film ni Acteur, elle doit copier uniquement des pointeurs.
 void ListeFilms::ajouterFilms(Film* filmAjout) {
@@ -211,10 +216,11 @@ ostream& operator<<(ostream& os, const Item& item) {
 	item.afficher(os);
 	return os;
 }
-
-void afficherVecteur(const vector<unique_ptr<Item>>& vectorItems) {
+// Donc on veut 2 types d'affichages, un type long et un type court et on peut spécifier quel type utiliser?
+template<typename T>
+void afficherVecteur(const T& vectorItems) {
 	for (auto&& n : vectorItems) {
-		cout << *n;
+		cout << *n << ligneDeSeparation;
 	}
 }
 
@@ -230,8 +236,6 @@ Film* ListeFilms::getFilmParCritere(const function<bool(Film*)>& critere) {
 int main()
 {
 	bibliotheque_cours::activerCouleursAnsi();  // Permet sous Windows les "ANSI escape code" pour changer de couleurs https://en.wikipedia.org/wiki/ANSI_escape_code ; les consoles Linux/Mac les supportent normalement par défaut.
-
-	static const string ligneDeSeparation = "\n\033[35m════════════════════════════════════════\033[0m\n";
 
 	//TODO: Chaque TODO dans cette fonction devrait se faire en 1 ou 2 lignes, en appelant les fonctions écrites.
 
@@ -249,6 +253,14 @@ int main()
 		Livre livre(nom, anneeSortie, auteur, copies, pages);
 		vectorItems.push_back(make_unique<Livre>(livre));
 	}
+	
+	vector<unique_ptr<Item>> listeItems;
+	Livre livre("nom", 1, "auteur", 10, 100);
+	cout << typeid(*vectorItems[1]).name();
+
+	// Pk ca marche pas? Est-ce qu'on devrait utiliser move?
+	listeItems.push_back(make_unique<Livre>(vectorItems[vectorItems.size() - 2]));
+
 	afficherVecteur(vectorItems);
 
 	vector<Item*> hobbitItems;

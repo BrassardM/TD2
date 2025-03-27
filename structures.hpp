@@ -17,10 +17,9 @@ public:
 };
 
 class Item : public Affichable {
-private:
+public:
 	string titre;
 	int anneeSortie;
-public:
 	void afficher(ostream& os) const override {
 		os << "Titre : " << titre << endl << " Annee Sortie : " << anneeSortie << endl;
 	}
@@ -122,18 +121,19 @@ public:
 		elements[index] = ajout;
 	}
 };
+
 using ListeActeurs = Liste<Acteur>;
 struct Acteur
 {
 	std::string nom = ""; int anneeNaissance = 0; char sexe = ' ';
 	//ListeFilms joueDans;
 };
+
 class Film : virtual public Item {
-private:
+public:
 	string realisateur = ""; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
 	int recette = 0; // Année de sortie et recette globale du film en millions de dollars
 	ListeActeurs acteurs;
-public:
 	Film() {
 		realisateur = ""; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
 		recette = 0; // Année de sortie et recette globale du film en millions de dollars
@@ -165,13 +165,12 @@ public:
 		os << endl;
 	}
 };
-
+// Check si c'est bien ça qu'on veut dire 
 class Livre : virtual public Item {
-private:
+public:
 	string auteur;
 	int copies;
 	int nombrePages;
-public:
 	Livre() : copies(0), nombrePages(0) {};
 	Livre(string ti, int annee, string aut, int cop, int npag) : Item(ti, annee), auteur(aut), copies(cop), nombrePages(npag) {
 	}
