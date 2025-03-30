@@ -273,6 +273,7 @@ int main()
 	for (int i : range(nFilms)) {
 		listOrdreOriginal.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(vectorItems[vectorItems.size() - nLivres - i - 1]))))));
 	}
+
 	cout << "Forward list avec même ordre: " << ligneDeSeparation << endl;
 	afficherVecteur(listOrdreOriginal);
 	
