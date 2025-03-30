@@ -21,7 +21,7 @@ public:
 	string titre;
 	int anneeSortie;
 	void afficher(ostream& os) const override {
-		os << "Titre : " << titre << endl << " Annee Sortie : " << anneeSortie << endl;
+		os << titre;// << endl << " Annee Sortie : " << anneeSortie << endl;
 	}
 	Item() : anneeSortie(0) {}
 	Item(string ti, int an) : titre(ti), anneeSortie(an) {}
@@ -156,13 +156,14 @@ public:
 	}
 	void afficher(ostream& os) const override {
 		Item::afficher(os);
-		os << " Realisateur : " << realisateur << endl << " Recette : " << recette << "M$" << endl << " Liste des Acteurs : " << endl;
+		os << ", par " << realisateur << endl; //<< " Recette : " << recette << "M$" << endl << " Liste des Acteurs : " << endl;
+		/*
 		span<shared_ptr<Acteur>> spanActeur = acteurs.enSpan();
 		int i{};
 		for (auto n : spanActeur) {
 			os << "Acteur #" << ++i << "." << endl << "\tNom : " << n.get()->nom << endl << "\tAnnee de naissance : " << n.get()->anneeNaissance << endl << "\tSexe : " << n.get()->sexe << endl;
 		}
-		os << endl;
+		os << endl;*/
 	}
 };
 // Check si c'est bien ça qu'on veut dire 
@@ -177,7 +178,7 @@ public:
 	Livre(const Livre& autre) : Item(static_cast<Item>(autre)), auteur(autre.auteur), copies(autre.copies), nombrePages(autre.nombrePages) {}
 	void afficher(ostream& os) const override {
 		Item::afficher(os);
-		os << " Auteur : " << auteur << endl << " Copies vendues : " << copies << "M" << endl << " Nombre de pages : " << nombrePages << endl << endl;
+		os << ", de " << auteur << endl; //<< " Copies vendues : " << copies << "M" << endl << " Nombre de pages : " << nombrePages << endl << endl;
 	}
 };
 
@@ -186,6 +187,7 @@ class FilmLivre : public Film, public Livre {
 public:
 	void afficher(ostream& os) const override {
 		Item::afficher(os);
+		os << ", par " << this->realisateur << ", de " << this->auteur;
 	}
 	FilmLivre(const Film& film, const Livre& livre) : Item(static_cast<Item>(film)), Film(film), Livre(livre) {}
 };

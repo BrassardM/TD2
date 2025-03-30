@@ -12,6 +12,8 @@
 #include <functional>
 #include <vector>
 #include <forward_list>
+#include <ranges>
+
 
 #include "cppitertools/range.hpp"
 
@@ -219,8 +221,10 @@ ostream& operator<<(ostream& os, const Item& item) {
 // Donc on veut 2 types d'affichages, un type long et un type court et on peut spécifier quel type utiliser?
 template<typename T>
 void afficherVecteur(const T& vectorItems) {
+	int nItem = 0;
 	for (auto&& n : vectorItems) {
-		cout << *n << ligneDeSeparation;
+		cout << nItem << ". " << *n << ligneDeSeparation;
+		++nItem;
 	}
 }
 
@@ -242,26 +246,36 @@ int main()
 	//TODO: La ligne suivante devrait lire le fichier binaire en allouant la mémoire nécessaire.  Devrait afficher les noms de 20 acteurs sans doublons (par l'affichage pour fins de débogage dans votre fonction lireActeur).
 	ListeFilms listeFilms("films.bin");
 	vector<unique_ptr<Item>> vectorItems; //Assignation de vector
+	int nFilms = 0;
 	for (Film* n : listeFilms.enSpan()) {
+		++nFilms;
 		vectorItems.push_back(make_unique<Film>(*n));
 	}
 	ifstream fichier("livres.txt");
 
 	string nom, auteur;
 	int anneeSortie, copies, pages;
+	int nLivres{};
 	while (fichier >> quoted(nom) >> anneeSortie >> quoted(auteur) >> copies >> pages) {
+		nLivres++;
 		Livre livre(nom, anneeSortie, auteur, copies, pages);
 		vectorItems.push_back(make_unique<Livre>(livre));
 	}
-	
-	vector<unique_ptr<Item>> listeItems;
-	Livre livre("nom", 1, "auteur", 10, 100);
-	cout << typeid(*vectorItems[1]).name();
-
-	// Pk ca marche pas? Est-ce qu'on devrait utiliser move?
-	listeItems.push_back(make_unique<Livre>(vectorItems[vectorItems.size() - 2]));
-
 	afficherVecteur(vectorItems);
+	// 1.1 Original order (1, 2, 3)
+	// 1.2 Reverse order (3, 2, 1)
+	// 1.3 Original order (1, 2, 3)
+	// 1.4 Original order in vector from list (1, 2, 3)
+	forward_list<unique_ptr<Item>> listOrdreOriginal;
+	for (int i : range(nLivres)) {
+		listOrdreOriginal.push_front(make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(vectorItems[vectorItems.size() - i - 1]))))));
+	}
+	for (int i : range(nFilms)) {
+		listOrdreOriginal.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(vectorItems[vectorItems.size() - nLivres - i - 1]))))));
+	}
+	cout << "Forward list avec même ordre: " << ligneDeSeparation << endl;
+	afficherVecteur(listOrdreOriginal);
+	
 
 	vector<Item*> hobbitItems;
 	for (auto&& n : vectorItems) {
