@@ -13,6 +13,10 @@
 #include<memory>
 #include <functional>
 #include <vector>
+#include <forward_list>
+#include <set>
+#include <unordered_map>
+#include <algorithm>
 
 #include "cppitertools/range.hpp"
 
@@ -230,15 +234,18 @@ ostream& operator<<(ostream& os, const Item& item) {
 	return os;
 }
 
-void afficherVecteur(const vector<unique_ptr<Item>>& vectorItems) {
+template <typename T>
+void afficherConteneur(const T& vectorItems) {
 	for (auto&& n : vectorItems) {
+		cout << "\n\033[32m════════════════════════\033[0m\n" << endl;
 		cout << *n;
 	}
+	cout << "\n\033[35m════════════════════════════════════════\033[0m\n";
 }
 
 Film* ListeFilms::getFilmParCritere(const function<bool(Film*)>& critere) {
 	for (unsigned i = 0; i < nElements_; i += 1) {
-		if (critere(elements_[i])) {
+		if (critere(elements_[i])) { 
 			return elements_[i];
 		}
 	}
@@ -256,18 +263,22 @@ int main()
 	//TODO: La ligne suivante devrait lire le fichier binaire en allouant la mémoire nécessaire.  Devrait afficher les noms de 20 acteurs sans doublons (par l'affichage pour fins de débogage dans votre fonction lireActeur).
 	ListeFilms listeFilms("films.bin");
 	vector<unique_ptr<Item>> vectorItems; //Assignation de vector
+	int nFilms{};
 	for (Film* n : listeFilms.enSpan()) {
 		vectorItems.push_back(make_unique<Film>(*n));
+		nFilms++;
 	}
 	ifstream fichier("livres.txt");
 
 	string nom, auteur;
 	int anneeSortie, copies, pages;
+	int nLivres{};
 	while (fichier >> quoted(nom) >> anneeSortie >> quoted(auteur) >> copies >> pages) {
 		Livre livre(nom, anneeSortie, auteur, copies, pages);
 		vectorItems.push_back(make_unique<Livre>(livre));
+		nLivres++;
 	}
-	afficherVecteur(vectorItems);
+	//afficherConteneur(vectorItems);
 
 	vector<Item*> hobbitItems;
 	for (auto&& n : vectorItems) {
@@ -278,80 +289,138 @@ int main()
 	FilmLivre hobbit(*(dynamic_cast<Film*>(hobbitItems[0])), *(dynamic_cast<Livre*>(hobbitItems[1])));
 	vectorItems.push_back(make_unique<FilmLivre>(hobbit));
 
-	cout << "INCLUANT LE COMBO FILMLIVRE HOBBIT" << endl << ligneDeSeparation;
-	afficherVecteur(vectorItems);
+	//cout << "INCLUANT LE COMBO FILMLIVRE HOBBIT" << endl << ligneDeSeparation;
+	//afficherConteneur(vectorItems);	
+	forward_list<shared_ptr<Item>> items;
 
+	//1.1
+	cout << "1.1 Copier les pointeurs du vecteur d’items final de la biliothèque dans une forward_list en O(n)" << endl;
+	for (int i = nLivres + nFilms; i >= 0 ; i -= 1) {
+		if (i == nLivres + nFilms){
+			items.push_front(make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*vectorItems[i])))));
+		}
+		else if (i < nLivres + nFilms && i >= nFilms) {
+			items.push_front(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*vectorItems[i])))));
+		}
+		else {
+			items.push_front(make_shared<Film>(*(dynamic_cast<Film*>(&(*vectorItems[i])))));
+		}
+	}
+	afficherConteneur(items);
+	//1.2 
+	cout << "Copier la liste qui est en ordre original à l’envers(le dernier item se retrouve en premier) en O(n)" << endl;
+	forward_list <unique_ptr<Item>> itemsR;
+	int i{};
+	for (auto&& it = items.begin(); it != items.end(); ++it) {
+		if (i < nFilms) {
+			itemsR.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*it))))));
+		}
+		else if (i < nFilms + nLivres) {
+			itemsR.push_front(make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(*it))))));
+		}
+		else {
+			itemsR.push_front(make_unique<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*(*it))))));
+		}
+		
+		i++;
+	}
+	afficherConteneur(itemsR);
+	//1.3
+	cout << "Copier la liste qui est en ordre original dans le même ordre qu’elle est, en O(n) dans une autre forward_list" << endl;
+	forward_list <unique_ptr<Item>> itemsC;
+	int j{};
+	itemsC.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*(items.begin())))))));
+	auto itC = (itemsC.begin());
+	for (auto&& it = items.begin(); it != items.end(); ++it){
+		if (j == 0) {
+			j++;
+			continue;
+		}
+		if (j < nFilms) {
+			itemsC.insert_after(itC,(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*it)))))));
+		}
+		else if (j < nFilms + nLivres) {
+			itemsC.insert_after(itC, (make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(*it)))))));
+		}
+		else {
+			itemsC.insert_after(itC, make_unique<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*(*it))))));
+		}
+		j++;
+		++itC;
+	}
+	afficherConteneur(itemsC);
+	
+	//1.4
+	cout << "Copier la liste qui est en ordre original à l’envers dans un vector avec les mêmes contraintes que ci-dessus" << endl;
+	int k{};
+	vector<unique_ptr<Item>> vectorItemsRev(nFilms + nLivres + 1);
+	for (auto&& it = items.begin(); it != items.end(); ++it) {
+		int vecIndex = nLivres + nFilms - k;
+		if (k < nFilms) {
+			vectorItemsRev.at(vecIndex) = (make_unique<Film>(*(dynamic_cast<Film*>(&(*(*it))))));
+		}
+		else if (k < nFilms + nLivres) {
+			vectorItemsRev.at(vecIndex) = (make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(*it))))));
+		}
+		else {
+			vectorItemsRev.at(vecIndex) = (make_unique<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*(*it))))));
+		}
+		k++;
+	}
+	afficherConteneur(vectorItemsRev);
+	//O(n)
+	
+	//1.5 
+	for (auto&& n : (*(dynamic_cast<Film*>(&(*(vectorItems[0]))))).acteurs) {
+		cout << n.nom << endl;
+	}
 
-	//cout << ligneDeSeparation << "Le premier film de la liste est:" << endl;
-	////TODO: Afficher le premier film de la liste.  Devrait être Alien.
-	//// Une facon plus simple de faire ca
+	//2.1
+	auto cmp = [](shared_ptr<Item> a, shared_ptr<Item>b) {return ((*a) > (*b)); };
+	set <shared_ptr<Item>, decltype(cmp)> itemSet;
+	
+	int h{};
+	for (auto&& n : vectorItems) {
+		if (h < nFilms) {
+			itemSet.insert(make_shared<Film>(*(dynamic_cast<Film*>(& (*n)))));
+		}
+		else if (h < nFilms + nLivres) {
+			itemSet.insert(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*n)))));
+		}
+		else {
+			itemSet.insert(make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*n)))));
+		}
+		h++;
+	}
+	afficherConteneur(itemSet);
 
-	//cout << *vectorFilms[0];
+	//2.2
+	unordered_map<string, shared_ptr<Item>> mapItems;
 
-	////TODO: Afficher le premier film de la liste.  Devrait être Alien.
-	//cout << ligneDeSeparation << "Sklien, Alien et listeFilms[1] modifiee:" << endl;
+	int l{};
+	for (auto&& n : vectorItems) {
+		if (l < nFilms) {
+			mapItems.insert({(*n).titre, make_shared<Film>(*(dynamic_cast<Film*>(&(*n)))) });
+		}
+		else if (l < nFilms + nLivres) {
+			mapItems.insert({ (*n).titre,(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*n))))) });
+		}
+		else {
+			mapItems.insert({ (*n).titre, make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*n)))) });
+		}
+		l++;
+	}
+	cout << *(mapItems["The Hobbit"]);
+	
+	//3.1
+	vector<shared_ptr<Item>> vFilm;
+	auto iterCopy = copy_if(items.begin(), items.end(), back_inserter(vFilm), [&](shared_ptr<Item> i) {if (dynamic_cast<Film*>(i.get()) != NULL) 	return true; else return false; });
+	afficherConteneur(vFilm);
 
-	//Film skylien = *listeFilms[0];
-	//skylien.modifierTitre("Skylien");
+	//3.2
+	int sum{};
+	for_each(vFilm.begin(), vFilm.end(), [&](shared_ptr<Item> i) {sum += (*(dynamic_cast<Film*>(&(*i)))).recette; });
+	cout << "Somme des recettes : " << sum << "M$";
 
-	//// FONCTION AJOUTER
-	//skylien.ajouterEtModifierPremierActeur(listeFilms[1], 0, "Daniel Wroughton Craig");
-
-	//cout << "  -- SKYLIEN -- " << endl;
-	//cout << skylien;
-	//cout << "  -- Alien -- " << endl;
-	//cout << *listeFilms[0];
-	//cout << "  -- ListeFilms[1] -- " << endl;
-	//cout << *listeFilms[1];
-
-	//cout << ligneDeSeparation << "Fonction Lambda avec critere : " << endl;
-	//int recetteAObtenir = 955;
-	//auto critere = [&](Film* pFilm) -> bool {
-	//	if (pFilm->compareRecette(recetteAObtenir)) { return true; }
-	//	else { return false; } };
-	//cout << *(listeFilms.getFilmParCritere(critere)) << endl;
-
-
-	//cout << ligneDeSeparation << "Les films sont:" << endl;
-	////TODO: Afficher la liste des films.  Il devrait y en avoir 7.
-	//listeFilms.afficherListeFilms();
-
-	////TODO: Modifier l'année de naissance de Benedict Cumberbatch pour être 1976 (elle était 0 dans les données lues du fichier).  Vous ne pouvez pas supposer l'ordre des films et des acteurs dans les listes, il faut y aller par son nom.
-	//string bCumberbatch = "Benedict Cumberbatch";
-	//listeFilms.changerActeurDateNaissance(bCumberbatch, 1976);
-	////cout << ligneDeSeparation << "Liste des films où Benedict Cumberbatch joue sont:" << endl;
-	////TODO: Afficher la liste des films où Benedict Cumberbatch joue.  Il devrait y avoir Le Hobbit et Le jeu de l'imitation.
-	////listeFilms.afficherFilmographieActeur(bCumberbatch);
-
-	////TODO: Détruire et enlever le premier film de la liste (Alien).  Ceci devrait "automatiquement" (par ce que font vos fonctions) détruire les acteurs Tom Skerritt et John Hurt, mais pas Sigourney Weaver puisqu'elle joue aussi dans Avatar.
-	//detruireFilm(listeFilms.getElements()[0]);
-	//listeFilms.enleverFilm(listeFilms.getElements()[0]);
-	//cout << ligneDeSeparation << "Les films sont maintenant:" << endl;
-	////TODO: Afficher la liste des films.
-	//listeFilms.afficherListeFilms();
-	////listeFilms.afficherFilmographieActeur("Acteur qui n'existe pas");
-	////TODO: Faire les appels qui manquent pour avoir 0% de lignes non exécutées dans le programme (aucune ligne rouge dans la couverture de code; c'est normal que les lignes de "new" et "delete" soient jaunes).  Vous avez aussi le droit d'effacer les lignes du programmes qui ne sont pas exécutée, si finalement vous pensez qu'elle ne sont pas utiles.
-	////listeFilms.afficherFilmographieActeur("Cet acteur n'existe pas");
-
-	//// LISTE TEXTE
-	//Liste<string> listeTextes(4, 2);
-	//*(listeTextes[0]) = "liste texte entree 0";
-	//*(listeTextes[1]) = "liste texte entree 1";
-	//Liste<string> listeTextes2 = listeTextes;
-	//shared_ptr<string> pString = make_shared<string>("ajout d'un pointeur shared dans la liste texte 2");
-
-	//// Ajouter FONCTION
-	//listeTextes2.ajouter(pString, 0);
-
-	//*listeTextes[1] = "modification de l'entree 1 de la liste de texte 2 (devrait affecter la liste 1 aussi)";
-
-	//cout << endl << "LISTETEXTES[0] : " << *listeTextes[0] << endl;
-	//cout << "LISTETEXTES[1] : " << *listeTextes[1] << endl;
-
-	//cout << "LISTETEXTES2[0] : " << *listeTextes2[0] << endl;
-	//cout << "LISTETEXTES2[1] : " << *listeTextes2[1] << endl;
-
-
-	//TODO: Détruire tout avant de terminer le programme.  La bibliothèque de verification_allocation devrait afficher "Aucune fuite detectee." a la sortie du programme; il affichera "Fuite detectee:" avec la liste des blocs, s'il manque des delete.
 	listeFilms.deleteComplet();
 }
