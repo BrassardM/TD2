@@ -237,6 +237,36 @@ Film* ListeFilms::getFilmParCritere(const function<bool(Film*)>& critere) {
 	return nullptr;
 }
 
+forward_list<unique_ptr<Item>> copieForwardList(const forward_list<unique_ptr<Item>>& listeACopier, int nFilms) {
+	forward_list<unique_ptr<Item>> listeOrdreInverser;
+	int iteFilms = 0;
+	for (auto&& element : listeACopier) {
+		if (iteFilms != nFilms) {
+			++iteFilms;
+			listeOrdreInverser.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(element))))));
+		}
+		else
+		{
+			listeOrdreInverser.push_front(make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(element))))));
+		}
+	}
+	return listeOrdreInverser;
+}
+
+template<typename T>
+Iterator<T> Iterator<T>::operator++() {
+	position_ = position_->next_;
+}
+template<typename T>
+Iterator<T> Iterator<T>::operator--() {
+	position_ = position_->previous_;
+}
+template<typename T>
+shared_ptr<T> Iterator<T>::operator*() {
+	return position_->element_;
+}
+
+
 int main()
 {
 	bibliotheque_cours::activerCouleursAnsi();  // Permet sous Windows les "ANSI escape code" pour changer de couleurs https://en.wikipedia.org/wiki/ANSI_escape_code ; les consoles Linux/Mac les supportent normalement par défaut.
@@ -266,17 +296,28 @@ int main()
 	// 1.2 Reverse order (3, 2, 1)
 	// 1.3 Original order (1, 2, 3)
 	// 1.4 Original order in vector from list (1, 2, 3)
-	forward_list<unique_ptr<Item>> listOrdreOriginal;
+	forward_list<unique_ptr<Item>> listeOrdreOriginal;
 	for (int i : range(nLivres)) {
-		listOrdreOriginal.push_front(make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(vectorItems[vectorItems.size() - i - 1]))))));
+		listeOrdreOriginal.push_front(make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(vectorItems[vectorItems.size() - i - 1]))))));
 	}
 	for (int i : range(nFilms)) {
-		listOrdreOriginal.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(vectorItems[vectorItems.size() - nLivres - i - 1]))))));
+		listeOrdreOriginal.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(vectorItems[vectorItems.size() - nLivres - i - 1]))))));
 	}
 
 	cout << "Forward list avec même ordre: " << ligneDeSeparation << endl;
-	afficherVecteur(listOrdreOriginal);
+	afficherVecteur(listeOrdreOriginal);
 	
+	cout << "Forward list avec ordre inverse: " << ligneDeSeparation << endl;
+	forward_list<unique_ptr<Item>> listeOrdreInverser = copieForwardList(listeOrdreOriginal, nFilms);
+	afficherVecteur(listeOrdreInverser);
+
+	cout << "Forward list avec ordre original copié du permier forward list: " << ligneDeSeparation << endl;
+	forward_list<unique_ptr<Item>> listeOrdreOriginalCopy = copieForwardList(listeOrdreOriginal, nFilms);
+	// forward_list::reverse est complexité n, donc complexité totale est toujours n
+	listeOrdreOriginalCopy.reverse();
+	afficherVecteur(listeOrdreOriginalCopy);
+
+
 
 	vector<Item*> hobbitItems;
 	for (auto&& n : vectorItems) {
@@ -289,7 +330,13 @@ int main()
 
 	cout << "INCLUANT LE COMBO FILMLIVRE HOBBIT" << endl << ligneDeSeparation;
 	afficherVecteur(vectorItems);
+	Film film = *dynamic_cast<Film*>(&(*(vectorItems[0])));
+	Liste<Acteur> listeAct = (film.acteurs);
+	Iterator a = listeAct.begin();
+	Acteur acteur = *(*a);
+	cout << "hi"  << acteur.nom;
 
+	
 
 	listeFilms.deleteComplet();
 }

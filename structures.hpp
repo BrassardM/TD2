@@ -72,12 +72,39 @@ public:
 	}
 };
 
+template<typename T>
+class Node {
+public:
+	Node(const shared_ptr<T> element) : element_(element) {};
+private:
+	inline static constexpr Node* past_end = nullptr;
+	shared_ptr<T> element_;
+	Node* previous_ = past_end;
+	Node* next_ = past_end;
+	template <typename T> friend class Iterator;
+	template <typename T> friend class Liste;
+};
+
+template<typename T>
+class Iterator {
+public:
+	Iterator(Node<T>* position = Node<T>::past_end):position_(position) {};
+	shared_ptr<T> operator*();
+	Iterator operator++();
+	Iterator operator--();
+	bool operator==(const Iterator& autre) const = default;
+private:
+	Node<T>* position_;
+	template<typename T> friend class Liste;
+};
 template <typename T>
 class Liste {
 private:
 	int capacite;
 	int nElements;
 	unique_ptr<shared_ptr<T>[]> elements;
+	Node<T>* first_ = Node<T>::past_end;
+	Node<T>* last_ = Node<T>::past_end;
 
 public:
 	Liste() {
@@ -120,6 +147,7 @@ public:
 	void ajouter(shared_ptr<T> ajout, int index) {
 		elements[index] = ajout;
 	}
+	Iterator<T> begin() { return Iterator(first_); }
 };
 
 using ListeActeurs = Liste<Acteur>;
