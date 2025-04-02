@@ -42,8 +42,11 @@ public:
 		}
 		while (true)
 		{
-			if (i >= other.titre.size() || i >= titre.size()) {
+			if (i >= other.titre.size()) {
 				return false;
+			}
+			else if (i >= titre.size()) {
+				return true;
 			}
 			else if (toupper(titre[i]) < toupper(other.titre[i]))
 				return true;

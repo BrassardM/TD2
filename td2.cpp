@@ -376,7 +376,7 @@ int main()
 	}
 
 	//2.1
-	auto cmp = [](shared_ptr<Item> a, shared_ptr<Item>b) {return ((*a) > (*b)); };
+	auto cmp = [](shared_ptr<Item> a, shared_ptr<Item>b) {if ((dynamic_cast<FilmLivre*>(&(*a))) != NULL) { FilmLivre c = *(dynamic_cast<FilmLivre*>(&(*a))); c.titre = c.titre + "FILM LIVRE TITRE"; return c > *b; } else if ((dynamic_cast<FilmLivre*>(&(*b))) != NULL) { FilmLivre c = *(dynamic_cast<FilmLivre*>(&(*b))); c.titre = c.titre + "FILM LIVRE TITRE"; return *a > c; } else return ((*a) > (*b)); };
 	set <shared_ptr<Item>, decltype(cmp)> itemSet;
 	
 	int h{};
