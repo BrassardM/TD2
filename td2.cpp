@@ -35,6 +35,15 @@ typedef uint16_t UInt16;
 
 #pragma region "Fonctions de base pour lire le fichier binaire"//{
 
+/**
+* Module principal des travaux pratiques. Contient définition des méthode et le main.
+*
+* \file   exo1.cpp
+* \author Jiaqi Zhao et Matthew Brassard
+* \date   1er avril 2025
+* Créé le 7 février 2025
+*/
+
 UInt8 lireUint8(istream& fichier)
 {
 	UInt8 valeur = 0;
@@ -90,13 +99,13 @@ void ListeFilms::enleverFilm(Film* filmEnleve) {
 		}
 	}
 }
-//TODO: Une fonction pour trouver un Acteur par son nom dans une ListeFilms, qui retourne un pointeur vers l'acteur, ou nullptr si l'acteur n'est pas trouvé.  Devrait utiliser span.
-shared_ptr<Acteur> ListeFilms::trouverActeur(const string& nom) const {
+//TODO: Une fonction pour trouver un Acteur par son nom_ dans une ListeFilms, qui retourne un pointeur vers l'acteur, ou nullptr si l'acteur n'est pas trouvé.  Devrait utiliser span.
+shared_ptr<Acteur> ListeFilms::trouverActeur(const string& nom_) const {
 	span<Film*> spanFilms({ elements_, long unsigned(nElements_) });
 	for (Film* film : spanFilms) {
-		span<shared_ptr<Acteur>> spanActeur = ((film->acteurs).enSpan());
+		span<shared_ptr<Acteur>> spanActeur = ((film->acteurs_).enSpan());
 		for (shared_ptr<Acteur> m : spanActeur) {
-			if (m->nom == nom) {
+			if (m->nom_ == nom_) {
 				return m;
 			}
 		}
@@ -104,21 +113,21 @@ shared_ptr<Acteur> ListeFilms::trouverActeur(const string& nom) const {
 	return nullptr;
 }
 
-//TODO: Compléter les fonctions pour lire le fichier et créer/allouer une ListeFilms.  La ListeFilms devra être passée entre les fonctions, pour vérifier l'existence d'un Acteur avant de l'allouer à nouveau (cherché par nom en utilisant la fonction ci-dessus).
+//TODO: Compléter les fonctions pour lire le fichier et créer/allouer une ListeFilms.  La ListeFilms devra être passée entre les fonctions, pour vérifier l'existence d'un Acteur avant de l'allouer à nouveau (cherché par nom_ en utilisant la fonction ci-dessus).
 
 shared_ptr<Acteur> lireActeur(istream& fichier, const ListeFilms& listeFilms)
 {
 	shared_ptr<Acteur> acteur = make_shared<Acteur>();
-	acteur->nom = lireString(fichier);
-	acteur->anneeNaissance = lireUint16(fichier);
-	acteur->sexe = lireUint8(fichier);
+	acteur->nom_ = lireString(fichier);
+	acteur->anneeNaissance_ = lireUint16(fichier);
+	acteur->sexe_ = lireUint8(fichier);
 
-	shared_ptr<Acteur> acteurTrouver = listeFilms.trouverActeur(acteur->nom);
+	shared_ptr<Acteur> acteurTrouver = listeFilms.trouverActeur(acteur->nom_);
 	if (acteurTrouver != nullptr) {
 		return acteurTrouver;
 	}
 
-	return acteur; //TODO: Retourner un pointeur soit vers un acteur existant ou un nouvel acteur ayant les bonnes informations, selon si l'acteur existait déjà.  Pour fins de débogage, affichez les noms des acteurs crées; vous ne devriez pas voir le même nom d'acteur affiché deux fois pour la création.
+	return acteur; //TODO: Retourner un pointeur soit vers un acteur existant ou un nouvel acteur ayant les bonnes informations, selon si l'acteur existait déjà.  Pour fins de débogage, affichez les noms des acteurs_ crées; vous ne devriez pas voir le même nom_ d'acteur affiché deux fois pour la création.
 }
 
 Film* lireFilm(istream& fichier, const ListeFilms& listeFilms)
@@ -132,9 +141,9 @@ Film* lireFilm(istream& fichier, const ListeFilms& listeFilms)
 	Film* film = new Film(titre, realisateur, anneeSortie, recette, listeActeurs);
 
 	for (int i = 0; i < nElements; i++) {
-		shared_ptr<Acteur> Acteur = lireActeur(fichier, listeFilms); //TODO: Placer l'acteur au bon endroit dans les acteurs du film.
-		film->acteurs.ajouter(Acteur, i);
-		//film->acteurs.elements[i]->joueDans.ajouterFilms(film); //TODO: Ajouter le film à la liste des films dans lesquels l'acteur joue.
+		shared_ptr<Acteur> Acteur = lireActeur(fichier, listeFilms); //TODO: Placer l'acteur au bon endroit dans les acteurs_ du film.
+		film->acteurs_.ajouter(Acteur, i);
+		//film->acteurs_.elements[i]->joueDans.ajouterFilms(film); //TODO: Ajouter le film à la liste des films dans lesquels l'acteur joue.
 	}
 	return film; //TODO: Retourner le pointeur vers le nouveau film.
 }
@@ -163,16 +172,16 @@ ListeFilms::ListeFilms() {
 	elements_ = elementsListeFilms;
 }
 
-//TODO: Une fonction pour détruire un film (relâcher toute la mémoire associée à ce film, et les acteurs qui ne jouent plus dans aucun films de la collection).  Noter qu'il faut enleve le film détruit des films dans lesquels jouent les acteurs.  Pour fins de débogage, affichez les noms des acteurs lors de leur destruction.
+//TODO: Une fonction pour détruire un film (relâcher toute la mémoire associée à ce film, et les acteurs_ qui ne jouent plus dans aucun films de la collection).  Noter qu'il faut enleve le film détruit des films dans lesquels jouent les acteurs_.  Pour fins de débogage, affichez les noms des acteurs_ lors de leur destruction.
 
 void detruireFilm(Film* filmDetruit) {
-	/*for (unsigned i : range(0, filmDetruit->acteurs.nElements)) {
+	/*for (unsigned i : range(0, filmDetruit->acteurs_.nElements)) {
 
-		if (filmDetruit->acteurs.elements[i]->joueDans.getnElements() > 1) {
-			(filmDetruit->acteurs.elements[i]->joueDans).enleverFilm(filmDetruit);
+		if (filmDetruit->acteurs_.elements[i]->joueDans.getnElements() > 1) {
+			(filmDetruit->acteurs_.elements[i]->joueDans).enleverFilm(filmDetruit);
 		}
 		else {
-			delete filmDetruit->acteurs.elements[i];
+			delete filmDetruit->acteurs_.elements[i];
 		}
 	}*/
 	delete filmDetruit;
@@ -195,10 +204,10 @@ void ListeFilms::deleteElements() {
 
 void afficherActeur(const Acteur& acteur)
 {
-	cout << "  " << acteur.nom << ", " << acteur.anneeNaissance << " " << acteur.sexe << endl;
+	cout << "  " << acteur.nom_ << ", " << acteur.anneeNaissance_ << " " << acteur.sexe_ << endl;
 }
 
-//TODO: Une fonction pour afficher un film avec tous ces acteurs (en utilisant la fonction afficherActeur ci-dessus).
+//TODO: Une fonction pour afficher un film avec tous ces acteurs_ (en utilisant la fonction afficherActeur ci-dessus).
 
 void ListeFilms::afficherListeFilms() const
 {
@@ -206,12 +215,12 @@ void ListeFilms::afficherListeFilms() const
 	static const string ligneDeSeparation = "\n\033[35m-------\033[0m\n";
 	//TODO: Changer le for pour utiliser un span.
 	span<Film*> spanfilm({ elements_,long unsigned(nElements_) });
-	for (Film* n : spanfilm) {
+	for (Film* film : spanfilm) {
 		//TODO: Afficher le film.
-		//cout << ligneDeSeparation << n->titre << endl;
-		span<shared_ptr<Acteur>> spanActeur = n->spanActeur();
-		for (shared_ptr<Acteur> m : spanActeur) {
-			afficherActeur(*m);
+		//cout << ligneDeSeparation << n->titre_ << endl;
+		span<shared_ptr<Acteur>> spanActeur = film->spanActeur();
+		for (shared_ptr<Acteur> acteur : spanActeur) {
+			afficherActeur(*acteur);
 		}
 	}
 }
@@ -220,13 +229,13 @@ void ListeFilms::afficherListeFilms() const
 	//TODO: Utiliser votre fonction pour trouver l'acteur (au lieu de le mettre à nullptr).
 	const shared_ptr<Acteur> acteur = trouverActeur(nomActeur);
 	if (acteur == nullptr)
-		cout << "Aucun acteur de ce nom" << endl;
+		cout << "Aucun acteur de ce nom_" << endl;
 	else
 		acteur->joueDans.afficherListeFilms();
 }*/
 
 void ListeFilms::changerActeurDateNaissance(const string& nomActeur, int Date) {
-	trouverActeur(nomActeur)->anneeNaissance = Date;
+	trouverActeur(nomActeur)->anneeNaissance_ = Date;
 }
 
 ostream& operator<<(ostream& os, const Item& item) {
@@ -236,9 +245,11 @@ ostream& operator<<(ostream& os, const Item& item) {
 
 template <typename T>
 void afficherConteneur(const T& vectorItems) {
-	for (auto&& n : vectorItems) {
+	int index = 0;
+	for (auto&& item : vectorItems) {
 		cout << "\n\033[32m════════════════════════\033[0m\n" << endl;
-		cout << *n;
+		cout << index << ". " << *item;
+		++index;
 	}
 	cout << "\n\033[35m════════════════════════════════════════\033[0m\n";
 }
@@ -260,30 +271,30 @@ int main()
 
 	//TODO: Chaque TODO dans cette fonction devrait se faire en 1 ou 2 lignes, en appelant les fonctions écrites.
 
-	//TODO: La ligne suivante devrait lire le fichier binaire en allouant la mémoire nécessaire.  Devrait afficher les noms de 20 acteurs sans doublons (par l'affichage pour fins de débogage dans votre fonction lireActeur).
+	//TODO: La ligne suivante devrait lire le fichier binaire en allouant la mémoire nécessaire.  Devrait afficher les noms de 20 acteurs_ sans doublons (par l'affichage pour fins de débogage dans votre fonction lireActeur).
 	ListeFilms listeFilms("films.bin");
 	vector<unique_ptr<Item>> vectorItems; //Assignation de vector
 	int nFilms{};
-	for (Film* n : listeFilms.enSpan()) {
-		vectorItems.push_back(make_unique<Film>(*n));
+	for (Film* film : listeFilms.enSpan()) {
+		vectorItems.push_back(make_unique<Film>(*film));
 		nFilms++;
 	}
 	ifstream fichier("livres.txt");
 
-	string nom, auteur;
+	string nom_, auteur;
 	int anneeSortie, copies, pages;
 	int nLivres{};
-	while (fichier >> quoted(nom) >> anneeSortie >> quoted(auteur) >> copies >> pages) {
-		Livre livre(nom, anneeSortie, auteur, copies, pages);
+	while (fichier >> quoted(nom_) >> anneeSortie >> quoted(auteur) >> copies >> pages) {
+		Livre livre(nom_, anneeSortie, auteur, copies, pages);
 		vectorItems.push_back(make_unique<Livre>(livre));
 		nLivres++;
 	}
 	//afficherConteneur(vectorItems);
 
 	vector<Item*> hobbitItems;
-	for (auto&& n : vectorItems) {
-		if (n->checkTitre("Hobbit")) {
-			hobbitItems.push_back(n.get());
+	for (auto&& item : vectorItems) {
+		if (item->checkTitre("Hobbit")) {
+			hobbitItems.push_back(item.get());
 		}
 	}
 	FilmLivre hobbit(*(dynamic_cast<Film*>(hobbitItems[0])), *(dynamic_cast<Livre*>(hobbitItems[1])));
@@ -309,86 +320,95 @@ int main()
 	afficherConteneur(items);
 	//1.2 
 	cout << "Copier la liste qui est en ordre original à l’envers(le dernier item se retrouve en premier) en O(n)" << endl;
-	forward_list <unique_ptr<Item>> itemsR;
+	forward_list <unique_ptr<Item>> itemsListeReverse;
 	int i{};
 	for (auto&& it = items.begin(); it != items.end(); ++it) {
 		if (i < nFilms) {
-			itemsR.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*it))))));
+			itemsListeReverse.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*it))))));
 		}
 		else if (i < nFilms + nLivres) {
-			itemsR.push_front(make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(*it))))));
+			itemsListeReverse.push_front(make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(*it))))));
 		}
 		else {
-			itemsR.push_front(make_unique<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*(*it))))));
+			itemsListeReverse.push_front(make_unique<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*(*it))))));
 		}
 		
 		i++;
 	}
-	afficherConteneur(itemsR);
+	afficherConteneur(itemsListeReverse);
 	//1.3
 	cout << "Copier la liste qui est en ordre original dans le même ordre qu’elle est, en O(n) dans une autre forward_list" << endl;
-	forward_list <unique_ptr<Item>> itemsC;
+	forward_list <unique_ptr<Item>> itemsListeOrdreOriginal;
 	int j{};
-	itemsC.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*(items.begin())))))));
-	auto itC = (itemsC.begin());
+	itemsListeOrdreOriginal.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*(items.begin())))))));
+	auto iteOrdreOriginal = (itemsListeOrdreOriginal.begin());
 	for (auto&& it = items.begin(); it != items.end(); ++it){
 		if (j == 0) {
 			j++;
 			continue;
 		}
 		if (j < nFilms) {
-			itemsC.insert_after(itC,(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*it)))))));
+			itemsListeOrdreOriginal.insert_after(iteOrdreOriginal,(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*it)))))));
 		}
 		else if (j < nFilms + nLivres) {
-			itemsC.insert_after(itC, (make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(*it)))))));
+			itemsListeOrdreOriginal.insert_after(iteOrdreOriginal, (make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(*it)))))));
 		}
 		else {
-			itemsC.insert_after(itC, make_unique<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*(*it))))));
+			itemsListeOrdreOriginal.insert_after(iteOrdreOriginal, make_unique<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*(*it))))));
 		}
 		j++;
-		++itC;
+		++iteOrdreOriginal;
 	}
-	afficherConteneur(itemsC);
+	afficherConteneur(itemsListeOrdreOriginal);
 	
 	//1.4
 	cout << "Copier la liste qui est en ordre original à l’envers dans un vector avec les mêmes contraintes que ci-dessus" << endl;
 	int k{};
-	vector<unique_ptr<Item>> vectorItemsRev(nFilms + nLivres + 1);
+	vector<unique_ptr<Item>> vectorItemsReverse(nFilms + nLivres + 1);
 	for (auto&& it = items.begin(); it != items.end(); ++it) {
 		int vecIndex = nLivres + nFilms - k;
 		if (k < nFilms) {
-			vectorItemsRev.at(vecIndex) = (make_unique<Film>(*(dynamic_cast<Film*>(&(*(*it))))));
+			vectorItemsReverse.at(vecIndex) = (make_unique<Film>(*(dynamic_cast<Film*>(&(*(*it))))));
 		}
 		else if (k < nFilms + nLivres) {
-			vectorItemsRev.at(vecIndex) = (make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(*it))))));
+			vectorItemsReverse.at(vecIndex) = (make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(*it))))));
 		}
 		else {
-			vectorItemsRev.at(vecIndex) = (make_unique<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*(*it))))));
+			vectorItemsReverse.at(vecIndex) = (make_unique<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*(*it))))));
 		}
 		k++;
 	}
-	afficherConteneur(vectorItemsRev);
+	afficherConteneur(vectorItemsReverse);
 	//O(n)
 	
 	//1.5 
-	for (auto&& n : (*(dynamic_cast<Film*>(&(*(vectorItems[0]))))).acteurs) {
-		cout << n.nom << endl;
+	for (auto&& n : (*(dynamic_cast<Film*>(&(*(vectorItems[0]))))).acteurs_) {
+		cout << n.nom_ << endl;
 	}
 
 	//2.1
-	auto cmp = [](shared_ptr<Item> a, shared_ptr<Item>b) {if ((dynamic_cast<FilmLivre*>(&(*a))) != NULL) { FilmLivre c = *(dynamic_cast<FilmLivre*>(&(*a))); c.titre = c.titre + "FILM LIVRE TITRE"; return c > *b; } else if ((dynamic_cast<FilmLivre*>(&(*b))) != NULL) { FilmLivre c = *(dynamic_cast<FilmLivre*>(&(*b))); c.titre = c.titre + "FILM LIVRE TITRE"; return *a > c; } else return ((*a) > (*b)); };
+	auto cmp = [](shared_ptr<Item> itemComparerUn, shared_ptr<Item>itemComparerDeux) {
+		if ((dynamic_cast<FilmLivre*>(&(*itemComparerUn))) != NULL) {
+			FilmLivre filmLivre = *(dynamic_cast<FilmLivre*>(&(*itemComparerUn)));
+			filmLivre.titre_ = filmLivre.titre_ + "FILM LIVRE TITRE"; 
+			return filmLivre > *itemComparerDeux;
+		} else if ((dynamic_cast<FilmLivre*>(&(*itemComparerDeux))) != NULL) {
+			FilmLivre filmLivre = *(dynamic_cast<FilmLivre*>(&(*itemComparerDeux)));
+			filmLivre.titre_ = filmLivre.titre_ + "FILM LIVRE TITRE"; 
+			return *itemComparerUn > filmLivre;
+		} else return ((*itemComparerUn) > (*itemComparerDeux)); };
 	set <shared_ptr<Item>, decltype(cmp)> itemSet;
 	
 	int h{};
-	for (auto&& n : vectorItems) {
+	for (auto&& item : vectorItems) {
 		if (h < nFilms) {
-			itemSet.insert(make_shared<Film>(*(dynamic_cast<Film*>(& (*n)))));
+			itemSet.insert(make_shared<Film>(*(dynamic_cast<Film*>(& (*item)))));
 		}
 		else if (h < nFilms + nLivres) {
-			itemSet.insert(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*n)))));
+			itemSet.insert(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*item)))));
 		}
 		else {
-			itemSet.insert(make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*n)))));
+			itemSet.insert(make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*item)))));
 		}
 		h++;
 	}
@@ -398,15 +418,15 @@ int main()
 	unordered_map<string, shared_ptr<Item>> mapItems;
 
 	int l{};
-	for (auto&& n : vectorItems) {
+	for (auto&& item : vectorItems) {
 		if (l < nFilms) {
-			mapItems.insert({(*n).titre, make_shared<Film>(*(dynamic_cast<Film*>(&(*n)))) });
+			mapItems.insert({(*item).titre_, make_shared<Film>(*(dynamic_cast<Film*>(&(*item)))) });
 		}
 		else if (l < nFilms + nLivres) {
-			mapItems.insert({ (*n).titre,(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*n))))) });
+			mapItems.insert({ (*item).titre_,(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*item))))) });
 		}
 		else {
-			mapItems.insert({ (*n).titre, make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*n)))) });
+			mapItems.insert({ (*item).titre_, make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*item)))) });
 		}
 		l++;
 	}
@@ -419,7 +439,7 @@ int main()
 
 	//3.2
 	int sum{};
-	for_each(vFilm.begin(), vFilm.end(), [&](shared_ptr<Item> i) {sum += (*(dynamic_cast<Film*>(&(*i)))).recette; });
+	for_each(vFilm.begin(), vFilm.end(), [&](shared_ptr<Item> i) {sum += (*(dynamic_cast<Film*>(&(*i)))).recette_; });
 	cout << "Somme des recettes : " << sum << "M$";
 
 	listeFilms.deleteComplet();

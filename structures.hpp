@@ -11,6 +11,15 @@
 using namespace std;
 class Film; struct Acteur; // Permet d'utiliser les types alors qu'ils seront défini après.
 
+/**
+* Module qui contient les classes utilisées dans le module principale et qui nomme les méthodes.
+*
+* \file   td5.cpp
+* \author Jiaqi Zhao et Matthew Brassard
+* \date   1er avril 2025
+* Créé le 7 février 2025
+*/
+
 class Affichable {
 public:
 	virtual void afficher(ostream& os) const {}
@@ -19,38 +28,38 @@ public:
 
 class Item : public Affichable {
 private:
-	int anneeSortie;
+	int anneeSortie_;
 public:
-	string titre;
+	string titre_;
 	void afficher(ostream& os) const override {
-		os << titre;
+		os << titre_;
 	}
-	Item() : anneeSortie(0) {}
-	Item(string ti, int an) : titre(ti), anneeSortie(an) {}
-	Item(const Item& autre) : titre(autre.titre), anneeSortie(autre.anneeSortie) {}
+	Item() : anneeSortie_(0) {}
+	Item(string titre, int anneSortie) : titre_(titre), anneeSortie_(anneSortie) {}
+	Item(const Item& autre) : titre_(autre.titre_), anneeSortie_(autre.anneeSortie_) {}
 
 	void modifierTitre(string nTitre) {
-		titre = nTitre;
+		titre_ = nTitre;
 	}
 	bool checkTitre(string titreRecherche) {
-		return (titre.find(titreRecherche) != std::string::npos);
+		return (titre_.find(titreRecherche) != std::string::npos);
 	};
 	bool operator> (const Item& other) const {
 		int i{};
-		if (other.titre == titre) {
+		if (other.titre_ == titre_) {
 			return false;
 		}
 		while (true)
 		{
-			if (i >= other.titre.size()) {
+			if (i >= other.titre_.size()) {
 				return false;
 			}
-			else if (i >= titre.size()) {
+			else if (i >= titre_.size()) {
 				return true;
 			}
-			else if (toupper(titre[i]) < toupper(other.titre[i]))
+			else if (toupper(titre_[i]) < toupper(other.titre_[i]))
 				return true;
-			else if(toupper(titre[i]) > toupper(other.titre[i]))
+			else if(toupper(titre_[i]) > toupper(other.titre_[i]))
 				return false;
 			i++;
 		}
@@ -68,7 +77,7 @@ public:
 	Film** getElements() const { return elements_; }
 
 	void ajouterFilms(Film* filmAjout);
-	shared_ptr<Acteur> trouverActeur(const std::string& nom) const;
+	shared_ptr<Acteur> trouverActeur(const std::string& nom_) const;
 	void enleverFilm(Film* filmEnleve);
 
 	void afficherListeFilms() const;
@@ -97,60 +106,60 @@ public:
 template <typename T>
 class Liste {
 private:
-	int capacite;
-	int nElements;
-	unique_ptr<shared_ptr<T>[]> elements;
+	int capacite_;
+	int nElements_;
+	unique_ptr<shared_ptr<T>[]> elements_;
 protected:
 	T getElements(int i) {
-		return *(elements)[i];
+		return *(elements_)[i];
 	}
 public:
 	class iterator;
 	Liste() {
-		capacite = 1;
-		nElements = 0;
-		elements = make_unique<shared_ptr<T>[]>(capacite); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
+		capacite_ = 1;
+		nElements_ = 0;
+		elements_ = make_unique<shared_ptr<T>[]>(capacite_); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
 	}
 	Liste(int capaciteset, int nElementsSet) {
-		capacite = capaciteset;
-		nElements = nElementsSet;
-		elements = make_unique<shared_ptr<T>[]>(capacite); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
-		for (int i = 0; i < capacite; i++) {
-			elements[i] = make_shared<T>(T{});
+		capacite_ = capaciteset;
+		nElements_ = nElementsSet;
+		elements_ = make_unique<shared_ptr<T>[]>(capacite_); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
+		for (int i = 0; i < capacite_; i++) {
+			elements_[i] = make_shared<T>(T{});
 		}
 	}
 	void operator=(Liste<T>& toCopy) {
-		capacite = toCopy.capacite;
-		nElements = toCopy.nElements;
-		elements = make_unique<shared_ptr<T>[]>(capacite); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
-		for (unsigned i = 0; i < capacite; i++) {
-			elements[i] = toCopy.elements[i];
+		capacite_ = toCopy.capacite_;
+		nElements_ = toCopy.nElements_;
+		elements_ = make_unique<shared_ptr<T>[]>(capacite_); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
+		for (unsigned i = 0; i < capacite_; i++) {
+			elements_[i] = toCopy.elements_[i];
 		}
 	}
 	Liste(const Liste& toCopy) {
-		capacite = toCopy.capacite;
-		nElements = toCopy.nElements;
-		elements = make_unique<shared_ptr<T>[]>(capacite); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
-		for (unsigned i = 0; i < capacite; i++) {
-			elements[i] = toCopy.elements[i];
+		capacite_ = toCopy.capacite_;
+		nElements_ = toCopy.nElements_;
+		elements_ = make_unique<shared_ptr<T>[]>(capacite_); // Pointeur vers un tableau de Acteur*, chaque Acteur* pointant vers un Acteur.
+		for (unsigned i = 0; i < capacite_; i++) {
+			elements_[i] = toCopy.elements_[i];
 		}
 	}
 	span<shared_ptr<T>> enSpan() const {
-		long unsigned nUns = nElements;
-		span<shared_ptr<T>> spanActeur({ elements.get(), nUns });
+		long unsigned nUns = nElements_;
+		span<shared_ptr<T>> spanActeur({ elements_.get(), nUns });
 		return spanActeur;
 	}
 	shared_ptr<T> operator[](int index) {
-		return elements[index];
+		return elements_[index];
 	}
 	void ajouter(shared_ptr<T> ajout, int index) {
-		elements[index] = ajout;
+		elements_[index] = ajout;
 	}
 	iterator begin() {
 		return iterator(0, *this);
 	}
 	iterator end() {
-		return iterator(nElements,*this);
+		return iterator(nElements_,*this);
 	}
 };
 
@@ -159,94 +168,94 @@ using ListeActeurs = Liste<Acteur>;
 template <typename T>
 class Liste<T>::iterator {
 private:
-	int pos;
-	Liste &obj;
+	int pos_;
+	Liste &obj_;
 public:
-	iterator(int position, Liste& listeInst) : pos(position), obj(listeInst){
+	iterator(int position, Liste& listeInst) : pos_(position), obj_(listeInst){
 	}
 	iterator operator++(int){
-		pos += 1;
+		pos_ += 1;
 		return *this;
 	}
 	iterator &operator++(){
-		pos += 1;
+		pos_ += 1;
 		return *this;
 	}
 	T operator*() const {
-		return obj.getElements(pos);
+		return obj_.getElements(pos_);
 	}
 	bool operator!=(const iterator &other) const {
-		return pos != other.pos;
+		return pos_ != other.pos_;
 	}
 };
 
 struct Acteur
 {
-	std::string nom = ""; int anneeNaissance = 0; char sexe = ' ';
+	std::string nom_ = ""; int anneeNaissance_ = 0; char sexe_ = ' ';
 	//ListeFilms joueDans;
 };
 class Film : virtual public Item {
 private:
-	string realisateur = ""; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
+	string realisateur_ = ""; // Titre et nom_ du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
 public:
-	ListeActeurs acteurs;
-	int recette = 0; // Année de sortie et recette globale du film en millions de dollars
+	ListeActeurs acteurs_;
+	int recette_ = 0; // Année de sortie et recette_ globale du film en millions de dollars
 
 	Film() {
-		realisateur = ""; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
-		recette = 0; // Année de sortie et recette globale du film en millions de dollars
-		acteurs;
+		realisateur_ = ""; // Titre et nom_ du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
+		recette_ = 0; // Année de sortie et recette_ globale du film en millions de dollars
+		acteurs_;
 	}
-	Film(string ti, string real, int anne, int rec, ListeActeurs lA) : Item(ti, anne), realisateur(real), recette(rec) {
-		acteurs = lA;
+	Film(string titre, string realisateur, int anne, int recette, ListeActeurs listeActeurs) : Item(titre, anne), realisateur_(realisateur), recette_(recette) {
+		acteurs_ = listeActeurs;
 	}
 	bool compareRecette(int recetteO) {
-		return recette == recetteO;
+		return recette_ == recetteO;
 	}
-	friend shared_ptr<Acteur> ListeFilms::trouverActeur(const std::string& nom) const;
+	friend shared_ptr<Acteur> ListeFilms::trouverActeur(const std::string& nom_) const;
 	friend Film* lireFilm(istream& fichier, const ListeFilms& listeFilms);
-	//struct Film(const Film& toCopy) : Item(static_cast<Item>(toCopy)), realisateur(toCopy.realisateur), recette(toCopy.recette), acteurs(toCopy.acteurs) {}
+	//struct Film(const Film& toCopy) : Item(static_cast<Item>(toCopy)), realisateur_(toCopy.realisateur_), recette_(toCopy.recette_), acteurs_(toCopy.acteurs_) {}
 	void ajouterEtModifierPremierActeur(Film* film, int index, string nouveauNom) {
-		acteurs.ajouter(film->acteurs[0], index);
-		acteurs[index]->nom = nouveauNom;
+		acteurs_.ajouter(film->acteurs_[0], index);
+		acteurs_[index]->nom_ = nouveauNom;
 	}
 	span<shared_ptr<Acteur>> spanActeur() {
-		return acteurs.enSpan();
+		return acteurs_.enSpan();
 	}
 	void afficherRealisateur(ostream& os) const {
-		os << ", par " << realisateur;
+		os << ", par " << realisateur_;
 	}
 	void afficher(ostream& os) const override {
 		Item::afficher(os);
 		afficherRealisateur(os);
 		os << endl;
-		//os << " Realisateur : " << realisateur << endl << " Recette : " << recette << "M$" << endl << " Liste des Acteurs: " << endl;
-		//span<shared_ptr<Acteur>> spanActeur = acteurs.enSpan();
+		//os << " Realisateur : " << realisateur_ << endl << " Recette : " << recette_ << "M$" << endl << " Liste des Acteurs: " << endl;
+		//span<shared_ptr<Acteur>> spanActeur = acteurs_.enSpan();
 		//int i{};
 		//for (auto n : spanActeur) {
-		//	os << "Acteur #" << ++i << "." << endl << "\tNom: " << n.get()->nom << endl << "\tAnnee de naissance: " << n.get()->anneeNaissance << endl << "\tSexe (big pause): " << n.get()->sexe << endl << endl;
+		//	os << "Acteur #" << ++i << "." << endl << "\tNom: " << n.get()->nom_ << endl << "\tAnnee de naissance: " << n.get()->anneeNaissance_ << endl << "\tSexe (big pause): " << n.get()->sexe_ << endl << endl;
 		//}
 	}
 };
 
 class Livre : virtual public Item {
 private:
-	string auteur;
-	int copies;
-	int nombrePages;
+	string auteur_;
+	int copies_;
+	int nombrePages_;
 public:
-	Livre() : copies(0), nombrePages(0) {};
-	Livre(string ti, int annee, string aut, int cop, int npag) : Item(ti, annee), auteur(aut), copies(cop), nombrePages(npag) {
+	Livre() : copies_(0), nombrePages_(0) {};
+	Livre(string titre, int annee, string aut, int cop, int npag) : Item(titre, annee), auteur_(aut), copies_(cop), nombrePages_(npag) {
 	}
-	Livre(const Livre& autre) : Item(static_cast<Item>(autre)), auteur(autre.auteur), copies(autre.copies), nombrePages(autre.nombrePages) {}
+	Livre(const Livre& autre) : Item(static_cast<Item>(autre)), auteur_(autre.auteur_), copies_(autre.copies_), nombrePages_(autre.nombrePages_) {}
 	void afficherAuteur(ostream& os) const {
-		os << ", de " << auteur;
+		os << ", de " << auteur_;
 	};
 	void afficher(ostream& os) const override {
 		Item::afficher(os);
 		afficherAuteur(os);
 		os << endl;
-		//os << " Auteur: " << auteur << endl << " Copies vendues: " << copies << "M" << endl << " Nombre de pages: " << nombrePages << endl << endl;
+		//os << " Auteur: " << auteur_ << endl << " Copies vendues: " << copies_ << "M" << endl << " Nombre de pages: " << nombrePages_ << endl << endl;
 	}
 };
 
