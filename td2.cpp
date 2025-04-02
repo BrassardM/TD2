@@ -10,7 +10,7 @@
 #include <limits>
 #include <algorithm>
 #include <span>
-#include<memory>
+#include <memory>
 #include <functional>
 #include <vector>
 #include <forward_list>
@@ -34,6 +34,15 @@ typedef uint8_t UInt8;
 typedef uint16_t UInt16;
 
 #pragma region "Fonctions de base pour lire le fichier binaire"//{
+
+/**
+* Module principale du travail pratique. Des méthodes ainsi que le main sont définis dans ce fichier.
+*
+* \file   td5.cpp
+* \author Jiaqi Zhao et Matthew Brassard
+* \date   1er avril 2025
+* Créé le 7 février 2025
+*/
 
 UInt8 lireUint8(istream& fichier)
 {
@@ -94,9 +103,9 @@ void ListeFilms::enleverFilm(Film* filmEnleve) {
 shared_ptr<Acteur> ListeFilms::trouverActeur(const string& nom) const {
 	span<Film*> spanFilms({ elements_, long unsigned(nElements_) });
 	for (Film* film : spanFilms) {
-		span<shared_ptr<Acteur>> spanActeur = ((film->acteurs).enSpan());
+		span<shared_ptr<Acteur>> spanActeur = ((film->acteurs_).enSpan());
 		for (shared_ptr<Acteur> m : spanActeur) {
-			if (m->nom == nom) {
+			if (m->nom_ == nom) {
 				return m;
 			}
 		}
@@ -109,11 +118,11 @@ shared_ptr<Acteur> ListeFilms::trouverActeur(const string& nom) const {
 shared_ptr<Acteur> lireActeur(istream& fichier, const ListeFilms& listeFilms)
 {
 	shared_ptr<Acteur> acteur = make_shared<Acteur>();
-	acteur->nom = lireString(fichier);
-	acteur->anneeNaissance = lireUint16(fichier);
-	acteur->sexe = lireUint8(fichier);
+	acteur->nom_ = lireString(fichier);
+	acteur->anneeNaissance_ = lireUint16(fichier);
+	acteur->sexe_ = lireUint8(fichier);
 
-	shared_ptr<Acteur> acteurTrouver = listeFilms.trouverActeur(acteur->nom);
+	shared_ptr<Acteur> acteurTrouver = listeFilms.trouverActeur(acteur->nom_);
 	if (acteurTrouver != nullptr) {
 		return acteurTrouver;
 	}
@@ -133,7 +142,7 @@ Film* lireFilm(istream& fichier, const ListeFilms& listeFilms)
 
 	for (int i = 0; i < nElements; i++) {
 		shared_ptr<Acteur> Acteur = lireActeur(fichier, listeFilms); //TODO: Placer l'acteur au bon endroit dans les acteurs du film.
-		film->acteurs.ajouter(Acteur, i);
+		film->acteurs_.ajouter(Acteur, i);
 		//film->acteurs.elements[i]->joueDans.ajouterFilms(film); //TODO: Ajouter le film à la liste des films dans lesquels l'acteur joue.
 	}
 	return film; //TODO: Retourner le pointeur vers le nouveau film.
@@ -195,7 +204,7 @@ void ListeFilms::deleteElements() {
 
 void afficherActeur(const Acteur& acteur)
 {
-	cout << "  " << acteur.nom << ", " << acteur.anneeNaissance << " " << acteur.sexe << endl;
+	cout << "  " << acteur.nom_ << ", " << acteur.anneeNaissance_ << " " << acteur.sexe_ << endl;
 }
 
 //TODO: Une fonction pour afficher un film avec tous ces acteurs (en utilisant la fonction afficherActeur ci-dessus).
@@ -225,8 +234,8 @@ void ListeFilms::afficherListeFilms() const
 		acteur->joueDans.afficherListeFilms();
 }*/
 
-void ListeFilms::changerActeurDateNaissance(const string& nomActeur, int Date) {
-	trouverActeur(nomActeur)->anneeNaissance = Date;
+void ListeFilms::changerActeurDateNaissance(const string& nomActeur, int date) {
+	trouverActeur(nomActeur)->anneeNaissance_ = date;
 }
 
 ostream& operator<<(ostream& os, const Item& item) {
@@ -368,11 +377,10 @@ int main()
 		k++;
 	}
 	afficherConteneur(vectorItemsRev);
-	//O(n)
 	
 	//1.5 
-	for (auto&& n : (*(dynamic_cast<Film*>(&(*(vectorItems[0]))))).acteurs) {
-		cout << n.nom << endl;
+	for (auto&& n : (*(dynamic_cast<Film*>(&(*(vectorItems[0]))))).acteurs_) {
+		cout << n.nom_ << endl;
 	}
 
 	//2.1
@@ -400,13 +408,13 @@ int main()
 	int l{};
 	for (auto&& n : vectorItems) {
 		if (l < nFilms) {
-			mapItems.insert({(*n).titre, make_shared<Film>(*(dynamic_cast<Film*>(&(*n)))) });
+			mapItems.insert({(*n).titre_, make_shared<Film>(*(dynamic_cast<Film*>(&(*n)))) });
 		}
 		else if (l < nFilms + nLivres) {
-			mapItems.insert({ (*n).titre,(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*n))))) });
+			mapItems.insert({ (*n).titre_,(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*n))))) });
 		}
 		else {
-			mapItems.insert({ (*n).titre, make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*n)))) });
+			mapItems.insert({ (*n).titre_, make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*n)))) });
 		}
 		l++;
 	}
@@ -419,7 +427,7 @@ int main()
 
 	//3.2
 	int sum{};
-	for_each(vFilm.begin(), vFilm.end(), [&](shared_ptr<Item> i) {sum += (*(dynamic_cast<Film*>(&(*i)))).recette; });
+	for_each(vFilm.begin(), vFilm.end(), [&](shared_ptr<Item> i) {sum += (*(dynamic_cast<Film*>(&(*i)))).recette_; });
 	cout << "Somme des recettes : " << sum << "M$";
 
 	listeFilms.deleteComplet();
