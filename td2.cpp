@@ -10,7 +10,7 @@
 #include <limits>
 #include <algorithm>
 #include <span>
-#include <memory>
+#include<memory>
 #include <functional>
 #include <vector>
 #include <forward_list>
@@ -24,7 +24,14 @@
 #include "verification_allocation.hpp" // Nos fonctions pour le rapport de fuites de mémoire.
 #include "debogage_memoire.hpp"        // Ajout des numéros de ligne des "new" dans le rapport de fuites.  Doit être après les include du système, qui peuvent utiliser des "placement new" (non supporté par notre ajout de numéros de lignes).
 
-
+/**
+* Module principal des travaux pratiques. Contient définition des méthode et le main.
+*
+* \file   exo1.cpp
+* \author Jiaqi Zhao et Matthew Brassard
+* \date   1er avril 2025
+* Créé le 7 février 2025
+*/
 using namespace std;
 using namespace iter;
 
@@ -34,15 +41,6 @@ typedef uint8_t UInt8;
 typedef uint16_t UInt16;
 
 #pragma region "Fonctions de base pour lire le fichier binaire"//{
-
-/**
-* Module principale du travail pratique. Des méthodes ainsi que le main sont définis dans ce fichier.
-*
-* \file   td5.cpp
-* \author Jiaqi Zhao et Matthew Brassard
-* \date   1er avril 2025
-* Créé le 7 février 2025
-*/
 
 UInt8 lireUint8(istream& fichier)
 {
@@ -215,10 +213,10 @@ void ListeFilms::afficherListeFilms() const
 	static const string ligneDeSeparation = "\n\033[35m-------\033[0m\n";
 	//TODO: Changer le for pour utiliser un span.
 	span<Film*> spanfilm({ elements_,long unsigned(nElements_) });
-	for (Film* n : spanfilm) {
+	for (Film* film : spanfilm) {
 		//TODO: Afficher le film.
 		//cout << ligneDeSeparation << n->titre << endl;
-		span<shared_ptr<Acteur>> spanActeur = n->spanActeur();
+		span<shared_ptr<Acteur>> spanActeur = film->spanActeur();
 		for (shared_ptr<Acteur> m : spanActeur) {
 			afficherActeur(*m);
 		}
@@ -245,9 +243,9 @@ ostream& operator<<(ostream& os, const Item& item) {
 
 template <typename T>
 void afficherConteneur(const T& vectorItems) {
-	for (auto&& n : vectorItems) {
+	for (auto&& item : vectorItems) {
 		cout << "\n\033[32m════════════════════════\033[0m\n" << endl;
-		cout << *n;
+		cout << *item;
 	}
 	cout << "\n\033[35m════════════════════════════════════════\033[0m\n";
 }
@@ -273,8 +271,8 @@ int main()
 	ListeFilms listeFilms("films.bin");
 	vector<unique_ptr<Item>> vectorItems; //Assignation de vector
 	int nFilms{};
-	for (Film* n : listeFilms.enSpan()) {
-		vectorItems.push_back(make_unique<Film>(*n));
+	for (Film* film : listeFilms.enSpan()) {
+		vectorItems.push_back(make_unique<Film>(*film));
 		nFilms++;
 	}
 	ifstream fichier("livres.txt");
@@ -290,9 +288,9 @@ int main()
 	//afficherConteneur(vectorItems);
 
 	vector<Item*> hobbitItems;
-	for (auto&& n : vectorItems) {
-		if (n->checkTitre("Hobbit")) {
-			hobbitItems.push_back(n.get());
+	for (auto&& item : vectorItems) {
+		if (item->checkTitre("Hobbit")) {
+			hobbitItems.push_back(item.get());
 		}
 	}
 	FilmLivre hobbit(*(dynamic_cast<Film*>(hobbitItems[0])), *(dynamic_cast<Livre*>(hobbitItems[1])));
@@ -336,28 +334,28 @@ int main()
 	afficherConteneur(itemsR);
 	//1.3
 	cout << "Copier la liste qui est en ordre original dans le même ordre qu’elle est, en O(n) dans une autre forward_list" << endl;
-	forward_list <unique_ptr<Item>> itemsC;
+	forward_list <unique_ptr<Item>> itemsOriginalOrdre;
 	int j{};
-	itemsC.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*(items.begin())))))));
-	auto itC = (itemsC.begin());
+	itemsOriginalOrdre.push_front(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*(items.begin())))))));
+	auto itC = (itemsOriginalOrdre.begin());
 	for (auto&& it = items.begin(); it != items.end(); ++it){
 		if (j == 0) {
 			j++;
 			continue;
 		}
 		if (j < nFilms) {
-			itemsC.insert_after(itC,(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*it)))))));
+			itemsOriginalOrdre.insert_after(itC,(make_unique<Film>(*(dynamic_cast<Film*>(&(*(*it)))))));
 		}
 		else if (j < nFilms + nLivres) {
-			itemsC.insert_after(itC, (make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(*it)))))));
+			itemsOriginalOrdre.insert_after(itC, (make_unique<Livre>(*(dynamic_cast<Livre*>(&(*(*it)))))));
 		}
 		else {
-			itemsC.insert_after(itC, make_unique<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*(*it))))));
+			itemsOriginalOrdre.insert_after(itC, make_unique<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*(*it))))));
 		}
 		j++;
 		++itC;
 	}
-	afficherConteneur(itemsC);
+	afficherConteneur(itemsOriginalOrdre);
 	
 	//1.4
 	cout << "Copier la liste qui est en ordre original à l’envers dans un vector avec les mêmes contraintes que ci-dessus" << endl;
@@ -377,10 +375,11 @@ int main()
 		k++;
 	}
 	afficherConteneur(vectorItemsRev);
+	//O(n)
 	
 	//1.5 
-	for (auto&& n : (*(dynamic_cast<Film*>(&(*(vectorItems[0]))))).acteurs_) {
-		cout << n.nom_ << endl;
+	for (auto&& acteur : (*(dynamic_cast<Film*>(&(*(vectorItems[0]))))).acteurs_) {
+		cout << acteur.nom_ << endl;
 	}
 
 	//2.1
@@ -388,38 +387,37 @@ int main()
 	set <shared_ptr<Item>, decltype(cmp)> itemSet;
 	
 	int h{};
-	for (auto&& n : vectorItems) {
-		if (h < nFilms) {
-			itemSet.insert(make_shared<Film>(*(dynamic_cast<Film*>(& (*n)))));
-		}
-		else if (h < nFilms + nLivres) {
-			itemSet.insert(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*n)))));
-		}
-		else {
-			itemSet.insert(make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*n)))));
+	for (auto&& item : vectorItems) {
+		if (!(*item).checkTitre("The Hobbit")&& !(*item).checkTitre("Le Hobbit")) {
+			if (h < nFilms) {
+				itemSet.insert(make_shared<Film>(*(dynamic_cast<Film*>(&(*item)))));
+			}
+			else if (h < nFilms + nLivres) {
+				itemSet.insert(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*item)))));
+			}
 		}
 		h++;
 	}
+	itemSet.insert(make_shared<Livre>(*(dynamic_cast<FilmLivre*>(&(*vectorItems[vectorItems.size()-1])))));
 	afficherConteneur(itemSet);
 
 	//2.2
 	unordered_map<string, shared_ptr<Item>> mapItems;
 
 	int l{};
-	for (auto&& n : vectorItems) {
+	for (auto&& item : vectorItems) {
 		if (l < nFilms) {
-			mapItems.insert({(*n).titre_, make_shared<Film>(*(dynamic_cast<Film*>(&(*n)))) });
+			mapItems.insert({(*item).titre_, make_shared<Film>(*(dynamic_cast<Film*>(&(*item)))) });
 		}
 		else if (l < nFilms + nLivres) {
-			mapItems.insert({ (*n).titre_,(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*n))))) });
+			mapItems.insert({ (*item).titre_,(make_shared<Livre>(*(dynamic_cast<Livre*>(&(*item))))) });
 		}
 		else {
-			mapItems.insert({ (*n).titre_, make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*n)))) });
+			mapItems.insert({ (*item).titre_, make_shared<FilmLivre>(*(dynamic_cast<FilmLivre*>(&(*item)))) });
 		}
 		l++;
 	}
 	cout << *(mapItems["The Hobbit"]);
-	
 	//3.1
 	vector<shared_ptr<Item>> vFilm;
 	auto iterCopy = copy_if(items.begin(), items.end(), back_inserter(vFilm), [&](shared_ptr<Item> i) {if (dynamic_cast<Film*>(i.get()) != NULL) 	return true; else return false; });
